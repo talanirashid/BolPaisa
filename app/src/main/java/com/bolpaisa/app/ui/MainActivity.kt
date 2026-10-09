@@ -7,8 +7,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -16,6 +18,7 @@ import com.bolpaisa.app.R
 import com.bolpaisa.app.audio.AudioPlayerManager
 import com.bolpaisa.app.audio.NumberToWordsConverter
 import com.bolpaisa.app.data.AppDatabase
+import com.bolpaisa.app.licensing.MerchantProfileManager
 import com.bolpaisa.app.licensing.SubscriptionManager
 import com.bolpaisa.app.reports.PdfReportGenerator
 import kotlinx.coroutines.Dispatchers
@@ -29,19 +32,29 @@ import java.util.Locale
 class MainActivity : AppCompatActivity() {
 
     private lateinit var subscriptionManager: SubscriptionManager
+    private lateinit var profileManager: MerchantProfileManager
     private lateinit var database: AppDatabase
     private lateinit var audioPlayerManager: AudioPlayerManager
+    private var activeShopSetupDialog: ShopSetupDialog? = null
+
+    private val selectLogoLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            activeShopSetupDialog?.updateLogoPreview(it)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         subscriptionManager = SubscriptionManager(this)
+        profileManager = MerchantProfileManager(this)
         database = AppDatabase.getDatabase(this)
         audioPlayerManager = AudioPlayerManager(this)
 
         // Top App Bar
         val tvStatusPill = findViewById<TextView>(R.id.tvStatusPill)
+        val btnAboutIcon = findViewById<ImageButton>(R.id.btnAboutIcon)
 
         // Collect Payment
         val btnReceivePayment = findViewById<Button>(R.id.btnReceivePayment)
@@ -58,6 +71,10 @@ class MainActivity : AppCompatActivity() {
         val cardSubscription = findViewById<View>(R.id.cardSubscription)
 
         updateStatusDisplay(tvStatusPill)
+
+        btnAboutIcon?.setOnClickListener {
+            startActivity(Intent(this, AboutActivity::class.java))
+        }
 
         btnReceivePayment.setOnClickListener {
             DynamicQrDialog(this).show()
@@ -90,6 +107,23 @@ class MainActivity : AppCompatActivity() {
         cardSubscription.setOnClickListener {
             showActivationDialog()
         }
+
+        checkAndPromptShopSetup()
+    }
+
+    private fun checkAndPromptShopSetup() {
+        if (!profileManager.hasProfile()) {
+            activeShopSetupDialog = ShopSetupDialog(
+                this,
+                onProfileSaved = {
+                    observeDashboardData()
+                },
+                onSelectLogoRequested = {
+                    selectLogoLauncher.launch("image/*")
+                }
+            )
+            activeShopSetupDialog?.show()
+        }
     }
 
     override fun onResume() {
@@ -118,7 +152,6 @@ class MainActivity : AppCompatActivity() {
             val todayCount = database.transactionDao().getDailyCount(startOfDay, endOfDay)
 
             withContext(Dispatchers.Main) {
-                // Today's Collections
                 tvTodayTotal.text = "Rs. ${"%.2f".format(todayTotal)}"
                 tvTodayCount.text = "$todayCount"
 
@@ -128,7 +161,6 @@ class MainActivity : AppCompatActivity() {
                     tvTodayStatus.text = "🕒 No payments received yet today"
                 }
 
-                // Last Payment Value
                 if (latest != null) {
                     val timeStr = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date(latest.timestamp))
                     tvLastPaymentValue.text = "Rs. ${latest.amount} (${latest.provider} • $timeStr)"
@@ -228,6 +260,7 @@ class MainActivity : AppCompatActivity() {
     private fun promptAndSendWhatsAppReceipt() {
         lifecycleScope.launch(Dispatchers.IO) {
             val latest = database.transactionDao().getLatestTransaction()
+            val shopName = profileManager.getShopName()
             withContext(Dispatchers.Main) {
                 if (latest == null) {
                     Toast.makeText(this@MainActivity, "No recent payment found to send receipt.", Toast.LENGTH_SHORT).show()
@@ -251,12 +284,12 @@ class MainActivity : AppCompatActivity() {
 
                     val dateStr = SimpleDateFormat("dd-MMM-yyyy HH:mm", Locale.getDefault()).format(Date(latest.timestamp))
                     val receiptText = """
-                        *BolPaisa Digital Receipt*
-                        Dukaan: BolPaisa Merchant
-                        Wasool Shuda Raqam: Rs. ${latest.amount}
-                        Transaction ID: ${latest.id}
+                        *$shopName - Digital Receipt*
+                        Wasool Shuda: Rs. ${latest.amount}
+                        Via: ${latest.provider}
+                        Trx ID: ${latest.id}
                         Tareekh: $dateStr
-                        Status: Wasool Shuda (Verified via BolPaisa)
+                        Tasdeeq Shuda via BolPaisa Soundbox
                         Shukriya!
                     """.trimIndent()
 

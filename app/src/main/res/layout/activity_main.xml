@@ -71,6 +71,17 @@
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
+            <!-- About / Settings Button -->
+            <ImageButton
+                android:id="@+id/btnAboutIcon"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="About"
+                android:src="@android:drawable/ic_menu_info_details"
+                android:tint="#94A3B8" />
+
         </LinearLayout>
 
         <!-- 2. Today's Collections Card -->

@@ -2,14 +2,19 @@ package com.bolpaisa.app.reports
 
 import android.content.ContentValues
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.pdf.PdfDocument
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Toast
+import com.bolpaisa.app.R
 import com.bolpaisa.app.data.TransactionEntity
+import com.bolpaisa.app.licensing.MerchantProfileManager
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
@@ -20,6 +25,10 @@ import java.util.Locale
 object PdfReportGenerator {
 
     fun generateDailyReport(context: Context, transactions: List<TransactionEntity>, totalSum: Double) {
+        val profileManager = MerchantProfileManager(context)
+        val shopName = profileManager.getShopName()
+        val customLogo = profileManager.getShopLogo()
+
         val pdfDocument = PdfDocument()
         val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
         val page = pdfDocument.startPage(pageInfo)
@@ -28,37 +37,50 @@ object PdfReportGenerator {
         val paint = Paint()
         val titlePaint = Paint().apply {
             color = Color.BLACK
-            textSize = 20f
+            textSize = 18f
             isFakeBoldText = true
         }
 
         val subTitlePaint = Paint().apply {
             color = Color.DKGRAY
-            textSize = 12f
+            textSize = 11f
         }
 
         val textPaint = Paint().apply {
             color = Color.BLACK
-            textSize = 12f
+            textSize = 11f
         }
 
         val boldPaint = Paint().apply {
             color = Color.BLACK
-            textSize = 12f
+            textSize = 11f
             isFakeBoldText = true
         }
 
         val dateFormat = SimpleDateFormat("dd-MMM-yyyy HH:mm", Locale.getDefault())
         val todayStr = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault()).format(Date())
 
-        canvas.drawText("BolPaisa - Daily Transaction Summary", 40f, 50f, titlePaint)
-        canvas.drawText("Developed by Mehrzaad Technologies | Date: $todayStr", 40f, 70f, subTitlePaint)
+        val logoBitmap: Bitmap? = customLogo ?: try {
+            BitmapFactory.decodeResource(context.resources, R.drawable.logo_mark)
+        } catch (e: Exception) {
+            null
+        }
+
+        var textStartX = 40f
+        if (logoBitmap != null) {
+            val destRect = Rect(40, 35, 88, 83)
+            canvas.drawBitmap(logoBitmap, null, destRect, paint)
+            textStartX = 100f
+        }
+
+        canvas.drawText("$shopName - Daily Summary", textStartX, 52f, titlePaint)
+        canvas.drawText("Verified via BolPaisa | Date: $todayStr", textStartX, 70f, subTitlePaint)
 
         paint.color = Color.GRAY
         paint.strokeWidth = 1f
-        canvas.drawLine(40f, 85f, 555f, 85f, paint)
+        canvas.drawLine(40f, 95f, 555f, 95f, paint)
 
-        var y = 110f
+        var y = 120f
         canvas.drawText("Time", 40f, y, boldPaint)
         canvas.drawText("Gateway / Provider", 180f, y, boldPaint)
         canvas.drawText("Sender Name", 340f, y, boldPaint)
@@ -90,7 +112,7 @@ object PdfReportGenerator {
 
         pdfDocument.finishPage(page)
 
-        val fileName = "BolPaisa_Report_$todayStr.pdf"
+        val fileName = "BolPaisa_${shopName.replace(" ", "_")}_$todayStr.pdf"
         savePdfFile(context, pdfDocument, fileName)
     }
 

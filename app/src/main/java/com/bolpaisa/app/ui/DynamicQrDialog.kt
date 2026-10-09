@@ -12,10 +12,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.bolpaisa.app.R
+import com.bolpaisa.app.licensing.MerchantProfileManager
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 
 class DynamicQrDialog(context: Context) : Dialog(context) {
+
+    private val profileManager = MerchantProfileManager(context)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,12 +46,31 @@ class DynamicQrDialog(context: Context) : Dialog(context) {
                 return@setOnClickListener
             }
 
-            val qrPayload = "raast://pay?pa=03336366291@raast&pn=BolPaisa&am=$amountStr&cu=PKR"
+            val shopName = profileManager.getShopName()
+            val gatewayType = profileManager.getGatewayType()
+            val accountOrTill = profileManager.getAccountOrTill()
+
+            val isTillId = accountOrTill.length <= 8 && accountOrTill.all { it.isDigit() }
+
+            val qrPayload = when (gatewayType.uppercase()) {
+                "RAAST" -> "raast://pay?receiver=$accountOrTill&amount=$amountStr&ref=BolPaisa"
+                "JAZZCASH" -> if (isTillId) {
+                    "jazzcash://merchant?merchant_id=$accountOrTill&amount=$amountStr"
+                } else {
+                    "jazzcash://pay?receiver=$accountOrTill&amount=$amountStr"
+                }
+                else -> if (isTillId) { // EASYPAISA
+                    "easypaisa://till?till_id=$accountOrTill&amount=$amountStr"
+                } else {
+                    "easypaisa://pay?receiver=$accountOrTill&amount=$amountStr"
+                }
+            }
+
             val bitmap = generateQrBitmap(qrPayload, 600, 600)
             if (bitmap != null) {
                 ivQrCode.setImageBitmap(bitmap)
                 ivQrCode.visibility = View.VISIBLE
-                tvQrPayload.text = "Raast QR Payload: Rs. $amountStr"
+                tvQrPayload.text = "Scan to Pay $shopName\n$gatewayType ($accountOrTill) • Rs. $amountStr"
                 tvQrPayload.visibility = View.VISIBLE
             } else {
                 Toast.makeText(context, "Failed to generate QR code", Toast.LENGTH_SHORT).show()
