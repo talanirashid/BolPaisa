@@ -8,11 +8,11 @@ import android.widget.ImageButton
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Switch
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bolpaisa.app.R
 import com.bolpaisa.app.audio.AudioPlayerManager
 import com.bolpaisa.app.audio.NumberToWordsConverter
+import com.bolpaisa.app.util.FeedbackHelper
 import com.bolpaisa.app.util.LocaleHelper
 
 class VoiceSettingsActivity : AppCompatActivity() {
@@ -56,16 +56,16 @@ class VoiceSettingsActivity : AppCompatActivity() {
         switchBtKeepAlive.isChecked = prefs.getBoolean(KEY_BT_KEEP_ALIVE, true)
 
         rgLanguage.setOnCheckedChangeListener { _, checkedId ->
-            val (langCode, langName) = when (checkedId) {
-                R.id.rbEnglish -> Pair("en", "ENGLISH")
-                R.id.rbSindhi -> Pair("sd", "SINDHI")
-                else -> Pair("ur", "URDU")
+            val (langCode, langName, langLabel) = when (checkedId) {
+                R.id.rbEnglish -> Triple("en", "ENGLISH", "English")
+                R.id.rbSindhi -> Triple("sd", "SINDHI", "Sindhi")
+                else -> Triple("ur", "URDU", "Urdu")
             }
 
             if (LocaleHelper.getLanguage(this) != langCode) {
                 LocaleHelper.setLocale(this, langCode)
                 prefs.edit().putString(KEY_VOICE_LANGUAGE, langName).apply()
-                Toast.makeText(this, "Language set to $langName", Toast.LENGTH_SHORT).show()
+                FeedbackHelper.showSuccess(findViewById(android.R.id.content), "Voice language set to $langLabel")
 
                 val intent = Intent(this, MainActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -78,7 +78,7 @@ class VoiceSettingsActivity : AppCompatActivity() {
         switchBtKeepAlive.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean(KEY_BT_KEEP_ALIVE, isChecked).apply()
             val status = if (isChecked) "enabled" else "disabled"
-            Toast.makeText(this, "Speaker keep-alive boost $status", Toast.LENGTH_SHORT).show()
+            FeedbackHelper.showSuccess(findViewById(android.R.id.content), "Speaker keep-alive boost $status")
         }
 
         btnTestAlert.setOnClickListener {
@@ -104,7 +104,7 @@ class VoiceSettingsActivity : AppCompatActivity() {
 
         if (tokens.isNotEmpty()) {
             audioPlayerManager.playSequence(tokens)
-            Toast.makeText(this, "Playing sample payment announcement...", Toast.LENGTH_SHORT).show()
+            FeedbackHelper.showInfo(findViewById(android.R.id.content), "Playing sample payment announcement...")
         }
     }
 
