@@ -24,14 +24,19 @@
         tools:targetApi="35">
 
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.SplashActivity"
             android:exported="true"
-            android:launchMode="singleTop">
+            android:theme="@style/Theme.BolPaisa">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop" />
 
         <activity android:name=".ui.LedgerActivity" />
         <activity android:name=".ui.SetupActivity" />
