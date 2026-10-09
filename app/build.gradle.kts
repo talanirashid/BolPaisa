@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.constraintlayout)
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
     // Local SQLite database (Room) for offline transactions ledger
     implementation(libs.room.runtime)
