@@ -23,15 +23,86 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Enter the amount your customer needs to pay."
+            android:text="Choose receiving wallet and enter amount"
             android:textColor="#94A3B8"
             android:textSize="13sp" />
+
+        <!-- Gateway Single-Select Chips -->
+        <RadioGroup
+            android:id="@+id/rgQrGateway"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rbChipEasypaisa"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#1E293B"
+                android:button="@null"
+                android:checked="true"
+                android:gravity="center"
+                android:paddingVertical="10dp"
+                android:text="Easypaisa"
+                android:textColor="#F8FAFC"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <RadioButton
+                android:id="@+id/rbChipJazzCash"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="#1E293B"
+                android:button="@null"
+                android:gravity="center"
+                android:paddingVertical="10dp"
+                android:text="JazzCash"
+                android:textColor="#F8FAFC"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <RadioButton
+                android:id="@+id/rbChipRaast"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="#1E293B"
+                android:button="@null"
+                android:gravity="center"
+                android:paddingVertical="10dp"
+                android:text="Raast"
+                android:textColor="#F8FAFC"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+        </RadioGroup>
+
+        <!-- Receiver Info / Tap to Set ID Bar -->
+        <TextView
+            android:id="@+id/tvReceiverInfoBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="#1E293B"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:padding="12dp"
+            android:text="Receiving on: Easypaisa (03336366291)"
+            android:textColor="#10B981"
+            android:textSize="13sp"
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/etAmount"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="16dp"
             android:background="#1E293B"
             android:hint="Rs. 0.00"
             android:inputType="numberDecimal"
@@ -87,8 +158,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:gravity="center"
             android:textColor="#38BDF8"
-            android:textSize="12sp"
+            android:textSize="13sp"
+            android:textStyle="bold"
             android:visibility="gone" />
 
     </LinearLayout>
