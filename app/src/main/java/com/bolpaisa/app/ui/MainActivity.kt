@@ -4,8 +4,10 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -39,53 +41,137 @@ class MainActivity : AppCompatActivity() {
         database = AppDatabase.getDatabase(this)
         audioPlayerManager = AudioPlayerManager(this)
 
-        val tvStatus = findViewById<TextView>(R.id.tvStatus)
-        val btnDynamicQr = findViewById<Button>(R.id.btnDynamicQr)
-        val btnEveningMunshi = findViewById<Button>(R.id.btnEveningMunshi)
-        val btnSendReceipt = findViewById<Button>(R.id.btnSendReceipt)
-        val btnActivate = findViewById<Button>(R.id.btnActivate)
-        val btnWhatsAppSupport = findViewById<Button>(R.id.btnWhatsAppSupport)
-        val btnAbout = findViewById<Button>(R.id.btnAbout)
+        // Top App Bar
+        val tvStatusPill = findViewById<TextView>(R.id.tvStatusPill)
+        val btnAboutIcon = findViewById<ImageButton>(R.id.btnAboutIcon)
 
-        updateStatusDisplay(tvStatus)
+        // Hero Soundbox Card
+        val tvHeroAmount = findViewById<TextView>(R.id.tvHeroAmount)
+        val tvHeroDetails = findViewById<TextView>(R.id.tvHeroDetails)
+        val btnReplayHero = findViewById<Button>(R.id.btnReplayHero)
+        val btnReceiptHero = findViewById<Button>(R.id.btnReceiptHero)
 
-        btnDynamicQr.setOnClickListener {
-            DynamicQrDialog(this).show()
+        // Quick Action Grid
+        val cardCustomerQr = findViewById<View>(R.id.cardCustomerQr)
+        val cardVoiceMunshi = findViewById<View>(R.id.cardVoiceMunshi)
+        val cardPdfLedger = findViewById<View>(R.id.cardPdfLedger)
+        val cardSpeakerBoost = findViewById<View>(R.id.cardSpeakerBoost)
+
+        // Quiet Footer
+        val tvFooterDeviceInfo = findViewById<TextView>(R.id.tvFooterDeviceInfo)
+        val btnFooterEnterKey = findViewById<Button>(R.id.btnFooterEnterKey)
+        val btnFooterSupport = findViewById<Button>(R.id.btnFooterSupport)
+
+        updateStatusDisplay(tvStatusPill, tvFooterDeviceInfo)
+
+        btnAboutIcon.setOnClickListener {
+            startActivity(Intent(this, AboutActivity::class.java))
         }
 
-        btnEveningMunshi.setOnClickListener {
-            runEveningMunshiAndReport()
+        btnReplayHero.setOnClickListener {
+            replayLastPayment()
         }
 
-        btnSendReceipt.setOnClickListener {
+        btnReceiptHero.setOnClickListener {
             promptAndSendWhatsAppReceipt()
         }
 
-        btnActivate.setOnClickListener {
-            showActivationDialog(tvStatus)
+        cardCustomerQr.setOnClickListener {
+            DynamicQrDialog(this).show()
         }
 
-        btnWhatsAppSupport.setOnClickListener {
+        cardVoiceMunshi.setOnClickListener {
+            runEveningMunshiAndReport()
+        }
+
+        cardPdfLedger.setOnClickListener {
+            runEveningMunshiAndReport()
+        }
+
+        cardSpeakerBoost.setOnClickListener {
+            Toast.makeText(this, "Speaker Boost Active: Keeping Bluetooth speaker awake every 25s", Toast.LENGTH_LONG).show()
+        }
+
+        btnFooterEnterKey.setOnClickListener {
+            showActivationDialog(tvStatusPill, tvFooterDeviceInfo)
+        }
+
+        btnFooterSupport.setOnClickListener {
             openWhatsAppSupport()
-        }
-
-        btnAbout.setOnClickListener {
-            startActivity(Intent(this, AboutActivity::class.java))
         }
     }
 
-    private fun updateStatusDisplay(tvStatus: TextView) {
+    override fun onResume() {
+        super.onResume()
+        val tvHeroAmount = findViewById<TextView>(R.id.tvHeroAmount)
+        val tvHeroDetails = findViewById<TextView>(R.id.tvHeroDetails)
+        observeLatestTransaction(tvHeroAmount, tvHeroDetails)
+    }
+
+    private fun observeLatestTransaction(tvHeroAmount: TextView, tvHeroDetails: TextView) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val latest = database.transactionDao().getLatestTransaction()
+            withContext(Dispatchers.Main) {
+                if (latest != null) {
+                    tvHeroAmount.text = "Rs. ${latest.amount}"
+                    val timeStr = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date(latest.timestamp))
+                    val sender = latest.senderName ?: "Customer"
+                    tvHeroDetails.text = "${latest.provider} • $sender • $timeStr"
+                } else {
+                    tvHeroAmount.text = "Rs. 0"
+                    tvHeroDetails.text = "Waiting for incoming payment..."
+                }
+            }
+        }
+    }
+
+    private fun updateStatusDisplay(tvStatusPill: TextView, tvFooterDeviceInfo: TextView) {
         val isActive = subscriptionManager.isSubscriptionActive()
         val remainingDays = subscriptionManager.getRemainingDays()
         val deviceId = subscriptionManager.getDeviceId()
 
+        tvFooterDeviceInfo.text = "ID: ${deviceId.take(8)}... • ${remainingDays}d Left"
+
         if (isActive) {
-            tvStatus.text = "Status: ACTIVE\nRemaining Trial / License: $remainingDays days\nDevice ID: $deviceId"
-            tvStatus.setTextColor(android.graphics.Color.parseColor("#10B981"))
+            tvStatusPill.text = "● Active (${remainingDays}d)"
+            tvStatusPill.setBackgroundColor(android.graphics.Color.parseColor("#064E3B"))
+            tvStatusPill.setTextColor(android.graphics.Color.parseColor("#10B981"))
         } else {
-            tvStatus.text = "Status: EXPIRED\nPlease activate your license to continue voice alerts.\nDevice ID: $deviceId"
-            tvStatus.setTextColor(android.graphics.Color.parseColor("#EF4444"))
-            showActivationDialog(tvStatus)
+            tvStatusPill.text = "● Expired"
+            tvStatusPill.setBackgroundColor(android.graphics.Color.parseColor("#7F1D1D"))
+            tvStatusPill.setTextColor(android.graphics.Color.parseColor("#EF4444"))
+            showActivationDialog(tvStatusPill, tvFooterDeviceInfo)
+        }
+    }
+
+    private fun replayLastPayment() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val latest = database.transactionDao().getLatestTransaction()
+            withContext(Dispatchers.Main) {
+                if (latest != null) {
+                    val tokens = mutableListOf<Int>()
+                    val dingRes = resources.getIdentifier("ding", "raw", packageName)
+                    if (dingRes != 0) tokens.add(dingRes)
+
+                    val providerResName = if (latest.provider.equals("JazzCash", true)) "jazzcash_par" else "easypaisa_par"
+                    val providerRes = resources.getIdentifier(providerResName, "raw", packageName)
+                    if (providerRes != 0) tokens.add(providerRes)
+
+                    tokens.addAll(NumberToWordsConverter.getUrduResIds(this@MainActivity, latest.amount))
+
+                    val rupayRes = resources.getIdentifier("rupay", "raw", packageName)
+                    if (rupayRes != 0) tokens.add(rupayRes)
+
+                    val wasoolRes = resources.getIdentifier("wasool_huay", "raw", packageName)
+                    if (wasoolRes != 0) tokens.add(wasoolRes)
+
+                    if (tokens.isNotEmpty()) {
+                        audioPlayerManager.playSequence(tokens)
+                    }
+                } else {
+                    Toast.makeText(this@MainActivity, "No previous transaction to replay.", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
@@ -174,7 +260,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showActivationDialog(tvStatus: TextView) {
+    private fun showActivationDialog(tvStatusPill: TextView, tvFooterDeviceInfo: TextView) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Activate BolPaisa License")
 
@@ -188,7 +274,7 @@ class MainActivity : AppCompatActivity() {
             val code = input.text.toString()
             if (subscriptionManager.activateLicense(code)) {
                 Toast.makeText(this, "License activated successfully!", Toast.LENGTH_LONG).show()
-                updateStatusDisplay(tvStatus)
+                updateStatusDisplay(tvStatusPill, tvFooterDeviceInfo)
             } else {
                 Toast.makeText(this, "Invalid or already used activation code.", Toast.LENGTH_LONG).show()
             }
