@@ -1,5 +1,6 @@
 package com.bolpaisa.app.ui
 
+import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
@@ -281,31 +282,34 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showActivationDialog(tvStatusPill: TextView, tvFooterDeviceInfo: TextView) {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Activate BolPaisa License")
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.dialog_activation)
 
-        val input = EditText(this).apply {
-            hint = "Enter 8-digit activation code (e.g. A3F8-9B2C)"
-            setPadding(40, 40, 40, 40)
+        val etCode = dialog.findViewById<EditText>(R.id.etActivationCode)
+        val btnSubmit = dialog.findViewById<Button>(R.id.btnSubmitActivation)
+        val btnCancel = dialog.findViewById<Button>(R.id.btnCancelActivation)
+        val btnWhatsApp = dialog.findViewById<Button>(R.id.btnWhatsAppDeviceId)
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
         }
-        builder.setView(input)
 
-        builder.setPositiveButton("Activate") { _, _ ->
-            val code = input.text.toString()
+        btnWhatsApp.setOnClickListener {
+            openWhatsAppSupport()
+        }
+
+        btnSubmit.setOnClickListener {
+            val code = etCode.text.toString().trim()
             if (subscriptionManager.activateLicense(code)) {
                 Toast.makeText(this, "License activated successfully!", Toast.LENGTH_LONG).show()
                 updateStatusDisplay(tvStatusPill, tvFooterDeviceInfo)
+                dialog.dismiss()
             } else {
                 Toast.makeText(this, "Invalid or already used activation code.", Toast.LENGTH_LONG).show()
             }
         }
 
-        builder.setNeutralButton("WhatsApp Device ID") { _, _ ->
-            openWhatsAppSupport()
-        }
-
-        builder.setNegativeButton("Cancel", null)
-        builder.show()
+        dialog.show()
     }
 
     private fun openWhatsAppSupport() {

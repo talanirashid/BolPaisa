@@ -23,14 +23,23 @@ class DynamicQrDialog(context: Context) : Dialog(context) {
 
         val etAmount = findViewById<EditText>(R.id.etAmount)
         val btnGenerate = findViewById<Button>(R.id.btnGenerateQr)
+        val btnCancel = findViewById<Button>(R.id.btnCancelQr)
         val ivQrCode = findViewById<ImageView>(R.id.ivQrCode)
         val tvQrPayload = findViewById<TextView>(R.id.tvQrPayload)
 
+        btnCancel.setOnClickListener {
+            dismiss()
+        }
+
         btnGenerate.setOnClickListener {
-            val amountStr = etAmount.text.toString().trim()
+            var amountStr = etAmount.text.toString().trim()
+            if (amountStr.startsWith("Rs.", true)) {
+                amountStr = amountStr.substring(3).trim()
+            }
             val amount = amountStr.toDoubleOrNull()
+
             if (amount == null || amount <= 0) {
-                Toast.makeText(context, "Please enter a valid amount", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Please enter a valid payment amount", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
