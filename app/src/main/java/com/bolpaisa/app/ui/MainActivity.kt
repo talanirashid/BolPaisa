@@ -46,8 +46,6 @@ class MainActivity : AppCompatActivity() {
         val btnAboutIcon = findViewById<ImageButton>(R.id.btnAboutIcon)
 
         // Hero Soundbox Card
-        val tvHeroAmount = findViewById<TextView>(R.id.tvHeroAmount)
-        val tvHeroDetails = findViewById<TextView>(R.id.tvHeroDetails)
         val btnReplayHero = findViewById<Button>(R.id.btnReplayHero)
         val btnReceiptHero = findViewById<Button>(R.id.btnReceiptHero)
 
@@ -105,13 +103,35 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         val tvHeroAmount = findViewById<TextView>(R.id.tvHeroAmount)
         val tvHeroDetails = findViewById<TextView>(R.id.tvHeroDetails)
-        observeLatestTransaction(tvHeroAmount, tvHeroDetails)
+        val tvTodayTotal = findViewById<TextView>(R.id.tvTodayTotal)
+        val tvTodayCount = findViewById<TextView>(R.id.tvTodayCount)
+        observeDashboardData(tvHeroAmount, tvHeroDetails, tvTodayTotal, tvTodayCount)
     }
 
-    private fun observeLatestTransaction(tvHeroAmount: TextView, tvHeroDetails: TextView) {
+    private fun observeDashboardData(
+        tvHeroAmount: TextView,
+        tvHeroDetails: TextView,
+        tvTodayTotal: TextView,
+        tvTodayCount: TextView
+    ) {
         lifecycleScope.launch(Dispatchers.IO) {
+            val calendar = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+            val startOfDay = calendar.timeInMillis
+            val endOfDay = System.currentTimeMillis()
+
             val latest = database.transactionDao().getLatestTransaction()
+            val todayTotal = database.transactionDao().getDailyTotal(startOfDay, endOfDay) ?: 0.0
+            val todayCount = database.transactionDao().getDailyCount(startOfDay, endOfDay)
+
             withContext(Dispatchers.Main) {
+                tvTodayTotal.text = "Rs. ${"%.2f".format(todayTotal)}"
+                tvTodayCount.text = "$todayCount Payment${if (todayCount != 1) "s" else ""}"
+
                 if (latest != null) {
                     tvHeroAmount.text = "Rs. ${latest.amount}"
                     val timeStr = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date(latest.timestamp))
@@ -119,7 +139,7 @@ class MainActivity : AppCompatActivity() {
                     tvHeroDetails.text = "${latest.provider} • $sender • $timeStr"
                 } else {
                     tvHeroAmount.text = "Rs. 0"
-                    tvHeroDetails.text = "Waiting for incoming payment..."
+                    tvHeroDetails.text = "Waiting for your next payment..."
                 }
             }
         }

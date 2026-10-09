@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0F172A"
+    android:background="#0D1729"
     android:fillViewport="true">
 
     <LinearLayout
@@ -30,7 +30,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_weight="1"
                 android:text="BolPaisa (بول پیسہ)"
-                android:textColor="@android:color/white"
+                android:textColor="#FFFFFF"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -43,7 +43,7 @@
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="6dp"
                 android:text="● Active (29d)"
-                android:textColor="#10B981"
+                android:textColor="#19C878"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
@@ -60,12 +60,63 @@
 
         </LinearLayout>
 
-        <!-- 2. Hero Soundbox Card (Top Center Counter Anchor) -->
+        <!-- 2. Today's Collections Summary Block -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:background="#1E293B"
+            android:background="#1B2940"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Today's Collections"
+                android:textAllCaps="true"
+                android:textColor="#94A3B8"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvTodayTotal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Rs. 0.00"
+                    android:textColor="#19C878"
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvTodayCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#2A3A54"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:text="0 Payments"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- 3. Hero Last Payment Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="#1B2940"
             android:orientation="vertical"
             android:padding="20dp">
 
@@ -81,10 +132,10 @@
                 android:id="@+id/tvHeroAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="6dp"
                 android:text="Rs. 0"
-                android:textColor="@android:color/white"
-                android:textSize="36sp"
+                android:textColor="#FFFFFF"
+                android:textSize="32sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -92,8 +143,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Waiting for incoming payment..."
-                android:textColor="#38BDF8"
+                android:text="Waiting for your next payment..."
+                android:textColor="#43C7FF"
                 android:textSize="14sp" />
 
             <LinearLayout
@@ -105,39 +156,43 @@
                 <Button
                     android:id="@+id/btnReplayHero"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="52dp"
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
-                    android:backgroundTint="#334155"
-                    android:text="🔁 Replay Audio"
+                    android:backgroundTint="#2A3A54"
+                    android:drawableStart="@drawable/ic_replay"
+                    android:drawablePadding="8dp"
+                    android:text="Replay Audio"
                     android:textAllCaps="false"
-                    android:textColor="@android:color/white"
-                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
                     android:textStyle="bold" />
 
                 <Button
                     android:id="@+id/btnReceiptHero"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="52dp"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:backgroundTint="#25D366"
-                    android:text="📱 Send Receipt"
+                    android:backgroundTint="#19C878"
+                    android:drawableStart="@drawable/ic_receipt"
+                    android:drawablePadding="8dp"
+                    android:text="Send Receipt"
                     android:textAllCaps="false"
-                    android:textColor="@android:color/white"
-                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
                     android:textStyle="bold" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <!-- 3. Quick Action Grid (2x2) -->
+        <!-- 4. Quick Merchant Tools (2x2 Grid) -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Quick Counter Actions"
+            android:text="Merchant Tools"
             android:textAllCaps="true"
             android:textColor="#94A3B8"
             android:textSize="12sp"
@@ -157,27 +212,34 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
-                android:background="#1E293B"
+                android:background="#1B2940"
                 android:clickable="true"
                 android:focusable="true"
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:contentDescription="QR Icon"
+                    android:src="@drawable/ic_qr" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🔳 Customer QR"
-                    android:textColor="#38BDF8"
-                    android:textSize="16sp"
+                    android:layout_marginTop="8dp"
+                    android:text="Customer QR"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Pre-fill amount &amp; scan"
+                    android:layout_marginTop="2dp"
+                    android:text="Pre-fill &amp; receive payment"
                     android:textColor="#94A3B8"
-                    android:textSize="12sp" />
+                    android:textSize="11sp" />
 
             </LinearLayout>
 
@@ -188,27 +250,34 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1"
-                android:background="#1E293B"
+                android:background="#1B2940"
                 android:clickable="true"
                 android:focusable="true"
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:contentDescription="Daily Summary Icon"
+                    android:src="@drawable/ic_analytics" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🔊 Daily Summary"
-                    android:textColor="#8B5CF6"
-                    android:textSize="16sp"
+                    android:layout_marginTop="8dp"
+                    android:text="Daily Summary"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Aaj ki kul wasooli"
+                    android:layout_marginTop="2dp"
+                    android:text="Review daily collections"
                     android:textColor="#94A3B8"
-                    android:textSize="12sp" />
+                    android:textSize="11sp" />
 
             </LinearLayout>
 
@@ -228,27 +297,34 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
-                android:background="#1E293B"
+                android:background="#1B2940"
                 android:clickable="true"
                 android:focusable="true"
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:contentDescription="PDF Icon"
+                    android:src="@drawable/ic_pdf" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="📄 PDF Ledger"
-                    android:textColor="#10B981"
-                    android:textSize="16sp"
+                    android:layout_marginTop="8dp"
+                    android:text="PDF Ledger"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Export EOD summary"
+                    android:layout_marginTop="2dp"
+                    android:text="Export EOD records"
                     android:textColor="#94A3B8"
-                    android:textSize="12sp" />
+                    android:textSize="11sp" />
 
             </LinearLayout>
 
@@ -259,27 +335,34 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1"
-                android:background="#1E293B"
+                android:background="#1B2940"
                 android:clickable="true"
                 android:focusable="true"
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:contentDescription="Speaker Icon"
+                    android:src="@drawable/ic_speaker" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="📻 Speaker Boost"
-                    android:textColor="#F59E0B"
-                    android:textSize="16sp"
+                    android:layout_marginTop="8dp"
+                    android:text="Speaker Boost"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Bluetooth keep-alive"
+                    android:layout_marginTop="2dp"
+                    android:text="Audio keep-alive active"
                     android:textColor="#94A3B8"
-                    android:textSize="12sp" />
+                    android:textSize="11sp" />
 
             </LinearLayout>
 
@@ -291,7 +374,7 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <!-- 4. Quiet Utility Footer -->
+        <!-- 5. Quiet Account Utility Footer -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -315,7 +398,7 @@
                 android:layout_height="wrap_content"
                 android:text="Enter Key"
                 android:textAllCaps="false"
-                android:textColor="#10B981"
+                android:textColor="#19C878"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
@@ -326,7 +409,7 @@
                 android:layout_height="wrap_content"
                 android:text="Support"
                 android:textAllCaps="false"
-                android:textColor="#38BDF8"
+                android:textColor="#43C7FF"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
