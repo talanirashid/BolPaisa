@@ -10,25 +10,56 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.bolpaisa.app.R
+import com.bolpaisa.app.audio.AudioPlayerManager
+import com.bolpaisa.app.audio.NumberToWordsConverter
+import com.bolpaisa.app.data.AppDatabase
 import com.bolpaisa.app.licensing.SubscriptionManager
+import com.bolpaisa.app.reports.PdfReportGenerator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var subscriptionManager: SubscriptionManager
+    private lateinit var database: AppDatabase
+    private lateinit var audioPlayerManager: AudioPlayerManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         subscriptionManager = SubscriptionManager(this)
+        database = AppDatabase.getDatabase(this)
+        audioPlayerManager = AudioPlayerManager(this)
 
         val tvStatus = findViewById<TextView>(R.id.tvStatus)
+        val btnDynamicQr = findViewById<Button>(R.id.btnDynamicQr)
+        val btnEveningMunshi = findViewById<Button>(R.id.btnEveningMunshi)
+        val btnSendReceipt = findViewById<Button>(R.id.btnSendReceipt)
         val btnActivate = findViewById<Button>(R.id.btnActivate)
         val btnWhatsAppSupport = findViewById<Button>(R.id.btnWhatsAppSupport)
         val btnAbout = findViewById<Button>(R.id.btnAbout)
 
         updateStatusDisplay(tvStatus)
+
+        btnDynamicQr.setOnClickListener {
+            DynamicQrDialog(this).show()
+        }
+
+        btnEveningMunshi.setOnClickListener {
+            runEveningMunshiAndReport()
+        }
+
+        btnSendReceipt.setOnClickListener {
+            promptAndSendWhatsAppReceipt()
+        }
 
         btnActivate.setOnClickListener {
             showActivationDialog(tvStatus)
@@ -54,8 +85,92 @@ class MainActivity : AppCompatActivity() {
         } else {
             tvStatus.text = "Status: EXPIRED\nPlease activate your license to continue voice alerts.\nDevice ID: $deviceId"
             tvStatus.setTextColor(android.graphics.Color.parseColor("#EF4444"))
-            // Automatically prompt activation dialog if expired
             showActivationDialog(tvStatus)
+        }
+    }
+
+    private fun runEveningMunshiAndReport() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val calendar = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+            val startOfDay = calendar.timeInMillis
+            val endOfDay = System.currentTimeMillis()
+
+            val total = database.transactionDao().getDailyTotal(startOfDay, endOfDay) ?: 0.0
+            val transactions = database.transactionDao().getMonthlyPayments(startOfDay, endOfDay)
+
+            withContext(Dispatchers.Main) {
+                val tokens = mutableListOf<Int>()
+                val dingRes = resources.getIdentifier("ding", "raw", packageName)
+                if (dingRes != 0) tokens.add(dingRes)
+
+                tokens.addAll(NumberToWordsConverter.getUrduResIds(this@MainActivity, total.toLong()))
+
+                val rupayRes = resources.getIdentifier("rupay", "raw", packageName)
+                if (rupayRes != 0) tokens.add(rupayRes)
+
+                val wasoolRes = resources.getIdentifier("wasool_huay", "raw", packageName)
+                if (wasoolRes != 0) tokens.add(wasoolRes)
+
+                if (tokens.isNotEmpty()) {
+                    audioPlayerManager.playSequence(tokens)
+                }
+
+                PdfReportGenerator.generateDailyReport(this@MainActivity, transactions, total)
+            }
+        }
+    }
+
+    private fun promptAndSendWhatsAppReceipt() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val latest = database.transactionDao().getLatestTransaction()
+            withContext(Dispatchers.Main) {
+                if (latest == null) {
+                    Toast.makeText(this@MainActivity, "No recent payment found to send receipt.", Toast.LENGTH_SHORT).show()
+                    return@withContext
+                }
+
+                val builder = AlertDialog.Builder(this@MainActivity)
+                builder.setTitle("Send Digital WhatsApp Receipt")
+
+                val input = EditText(this@MainActivity).apply {
+                    hint = "Enter Customer Mobile Number (e.g. 03001234567)"
+                    setPadding(40, 40, 40, 40)
+                }
+                builder.setView(input)
+
+                builder.setPositiveButton("Send Receipt") { _, _ ->
+                    var phone = input.text.toString().trim()
+                    if (phone.startsWith("0")) {
+                        phone = "92" + phone.substring(1)
+                    }
+
+                    val dateStr = SimpleDateFormat("dd-MMM-yyyy HH:mm", Locale.getDefault()).format(Date(latest.timestamp))
+                    val receiptText = """
+                        *BolPaisa Digital Receipt*
+                        Dukaan: BolPaisa Merchant
+                        Wasool Shuda Raqam: Rs. ${latest.amount}
+                        Transaction ID: ${latest.id}
+                        Tareekh: $dateStr
+                        Status: Wasool Shuda (Verified via BolPaisa)
+                        Shukriya!
+                    """.trimIndent()
+
+                    val url = "https://wa.me/$phone?text=${Uri.encode(receiptText)}"
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                    try {
+                        startActivity(intent)
+                    } catch (e: ActivityNotFoundException) {
+                        Toast.makeText(this@MainActivity, "WhatsApp is not installed on this device.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                builder.setNegativeButton("Cancel", null)
+                builder.show()
+            }
         }
     }
 
@@ -98,5 +213,10 @@ class MainActivity : AppCompatActivity() {
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(this, "WhatsApp is not installed on this device.", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        audioPlayerManager.release()
     }
 }

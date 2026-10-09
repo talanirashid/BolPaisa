@@ -12,4 +12,16 @@ interface TransactionDao {
 
     @Query("SELECT * FROM transactions ORDER BY timestamp DESC")
     fun getAllTransactions(): Flow<List<TransactionEntity>>
+
+    @Query("SELECT * FROM transactions ORDER BY timestamp DESC LIMIT 1")
+    suspend fun getLatestTransaction(): TransactionEntity?
+
+    @Query("SELECT SUM(amount) FROM transactions WHERE timestamp >= :startOfDay AND timestamp <= :endOfDay")
+    suspend fun getDailyTotal(startOfDay: Long, endOfDay: Long): Double?
+
+    @Query("SELECT COUNT(*) FROM transactions WHERE timestamp >= :startOfDay AND timestamp <= :endOfDay")
+    suspend fun getDailyCount(startOfDay: Long, endOfDay: Long): Int
+
+    @Query("SELECT * FROM transactions WHERE timestamp >= :startOfMonth AND timestamp <= :endOfMonth ORDER BY timestamp DESC")
+    suspend fun getMonthlyPayments(startOfMonth: Long, endOfMonth: Long): List<TransactionEntity>
 }

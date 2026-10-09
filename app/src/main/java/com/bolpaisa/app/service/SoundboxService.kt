@@ -4,7 +4,13 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorManager
+import android.media.AudioAttributes
+import android.media.AudioFormat
+import android.media.AudioTrack
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -14,9 +20,13 @@ import com.bolpaisa.app.data.AppDatabase
 import com.bolpaisa.app.data.TransactionEntity
 import com.bolpaisa.app.parser.PaymentDetails
 import com.bolpaisa.app.parser.PaymentParser
+import com.bolpaisa.app.sensor.ShakeDetector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class SoundboxService : Service() {
@@ -40,12 +50,96 @@ class SoundboxService : Service() {
     private lateinit var database: AppDatabase
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+    private var sensorManager: SensorManager? = null
+    private var shakeDetector: ShakeDetector? = null
+
+    private var keepAliveJob: Job? = null
+    private var lastPlaybackTime = System.currentTimeMillis()
+
     override fun onCreate() {
         super.onCreate()
         audioPlayerManager = AudioPlayerManager(this)
         paymentParser = PaymentParser()
         database = AppDatabase.getDatabase(this)
         startForegroundService()
+
+        setupShakeDetector()
+        startBluetoothKeepAlive()
+    }
+
+    private fun setupShakeDetector() {
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as? SensorManager
+        val accelerometer = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        if (accelerometer != null) {
+            shakeDetector = ShakeDetector {
+                Log.d(TAG, "Shake gesture detected - Replaying last payment announcement")
+                replayLastPayment()
+            }
+            sensorManager?.registerListener(shakeDetector, accelerometer, SensorManager.SENSOR_DELAY_UI)
+        }
+    }
+
+    private fun replayLastPayment() {
+        serviceScope.launch {
+            try {
+                val latest = database.transactionDao().getLatestTransaction()
+                if (latest != null) {
+                    playAnnouncement(PaymentDetails(latest.provider, latest.amount, latest.senderName))
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error fetching latest transaction for replay", e)
+            }
+        }
+    }
+
+    private fun startBluetoothKeepAlive() {
+        keepAliveJob = serviceScope.launch {
+            while (isActive) {
+                delay(25_000L) // 25 seconds
+                if (System.currentTimeMillis() - lastPlaybackTime >= 25_000L) {
+                    playNearSilentPing()
+                }
+            }
+        }
+    }
+
+    /**
+     * Plays an ultra-short (50ms) near-silent audio pulse to keep Bluetooth DAC/speaker active.
+     */
+    private fun playNearSilentPing() {
+        try {
+            val sampleRate = 8000
+            val numSamples = sampleRate / 20 // 50 ms
+            val buffer = ShortArray(numSamples) // Silent PCM buffer
+
+            val audioTrack = AudioTrack.Builder()
+                .setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build()
+                )
+                .setAudioFormat(
+                    AudioFormat.Builder()
+                        .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                        .setSampleRate(sampleRate)
+                        .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                        .build()
+                )
+                .setBufferSizeInBytes(buffer.size * 2)
+                .setTransferMode(AudioTrack.MODE_STATIC)
+                .build()
+
+            audioTrack.write(buffer, 0, buffer.size)
+            audioTrack.play()
+
+            serviceScope.launch {
+                delay(100L)
+                audioTrack.release()
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Near-silent Bluetooth ping failed: ${e.message}")
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -92,6 +186,7 @@ class SoundboxService : Service() {
     }
 
     private fun playAnnouncement(details: PaymentDetails) {
+        lastPlaybackTime = System.currentTimeMillis()
         val tokens = mutableListOf<Int>()
 
         val dingRes = resources.getIdentifier("ding", "raw", packageName)
@@ -139,6 +234,8 @@ class SoundboxService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        shakeDetector?.let { sensorManager?.unregisterListener(it) }
+        keepAliveJob?.cancel()
         audioPlayerManager.release()
     }
 }
