@@ -62,11 +62,39 @@ class AudioPlayerManager(private val context: Context) : TextToSpeech.OnInitList
             val currentVol = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
             val targetVol = (maxVol * 0.75f).toInt()
             if (currentVol < targetVol) {
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, targetVol, 0)
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, targetVol, AudioManager.FLAG_SHOW_UI)
                 Log.i(tag, "Boosted STREAM_MUSIC volume from $currentVol to $targetVol")
             }
         } catch (e: Exception) {
             Log.w(tag, "Volume guard warning: ${e.message}")
+        }
+    }
+
+    fun playSampleAlert(langCode: String) {
+        ensureAudibleVolume()
+
+        val sampleResName = when (langCode.lowercase()) {
+            "en" -> "sample_english"
+            "sd" -> "sample_sindhi"
+            else -> "sample_urdu"
+        }
+
+        val resId = context.resources.getIdentifier(sampleResName, "raw", context.packageName)
+        if (resId != 0) {
+            playSequence(listOf(resId), "Rs. 150 received via Easypaisa")
+        } else {
+            val dingRes = context.resources.getIdentifier("ding", "raw", context.packageName)
+            val epRes = context.resources.getIdentifier("easypaisa_par", "raw", context.packageName)
+            val rupayRes = context.resources.getIdentifier("rupay", "raw", context.packageName)
+            val wasoolRes = context.resources.getIdentifier("wasool_huay", "raw", context.packageName)
+
+            val seq = mutableListOf<Int>()
+            if (dingRes != 0) seq.add(dingRes)
+            if (epRes != 0) seq.add(epRes)
+            if (rupayRes != 0) seq.add(rupayRes)
+            if (wasoolRes != 0) seq.add(wasoolRes)
+
+            playSequence(seq, "Easypaisa par Rs. 150 wasool huay")
         }
     }
 

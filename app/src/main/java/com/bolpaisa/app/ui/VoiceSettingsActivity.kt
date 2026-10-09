@@ -17,7 +17,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bolpaisa.app.R
 import com.bolpaisa.app.audio.AudioPlayerManager
-import com.bolpaisa.app.audio.NumberToWordsConverter
 import com.bolpaisa.app.util.FeedbackHelper
 import com.bolpaisa.app.util.LocaleHelper
 
@@ -149,23 +148,21 @@ class VoiceSettingsActivity : AppCompatActivity() {
     }
 
     private fun playSampleAlert() {
-        val tokens = mutableListOf<Int>()
-        val dingRes = resources.getIdentifier("ding", "raw", packageName)
-        if (dingRes != 0) tokens.add(dingRes)
+        val activeLang = LocaleHelper.getLanguage(this)
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-        val providerRes = resources.getIdentifier("easypaisa_par", "raw", packageName)
-        if (providerRes != 0) tokens.add(providerRes)
-
-        tokens.addAll(NumberToWordsConverter.getUrduResIds(this, 150L))
-
-        val rupayRes = resources.getIdentifier("rupay", "raw", packageName)
-        if (rupayRes != 0) tokens.add(rupayRes)
-
-        val wasoolRes = resources.getIdentifier("wasool_huay", "raw", packageName)
-        if (wasoolRes != 0) tokens.add(wasoolRes)
+        try {
+            val currentVol = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+            val maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+            if (currentVol == 0) {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (maxVol * 0.75f).toInt(), AudioManager.FLAG_SHOW_UI)
+            }
+        } catch (e: Exception) {
+            android.util.Log.w("BolPaisaAudio", "Volume check warning: ${e.message}")
+        }
 
         FeedbackHelper.showInfo(findViewById(android.R.id.content), "Playing sample payment announcement...")
-        audioPlayerManager.playSequence(tokens, "Easypaisa par Rs. 150 wasool huay")
+        audioPlayerManager.playSampleAlert(activeLang)
     }
 
     override fun onDestroy() {
