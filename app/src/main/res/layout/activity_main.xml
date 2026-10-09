@@ -18,21 +18,45 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:contentDescription="BolPaisa Logo"
-                android:src="@drawable/logo_mark" />
+            <!-- Logo Container Box -->
+            <LinearLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="#FFFFFF"
+                android:gravity="center"
+                android:padding="6dp">
 
-            <TextView
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="BolPaisa Logo"
+                    android:src="@drawable/logo_mark" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="12dp"
                 android:layout_weight="1"
-                android:text="BolPaisa (بول پیسہ)"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="BolPaisa"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Merchant Dashboard"
+                    android:textColor="#A7B7CD"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
 
             <!-- Active Status Pill -->
             <TextView
@@ -42,223 +66,208 @@
                 android:background="#064E3B"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="6dp"
-                android:text="● Active (29d)"
+                android:text="✓ Active"
                 android:textColor="#19C878"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
-            <!-- About / Settings Button -->
-            <ImageButton
-                android:id="@+id/btnAboutIcon"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_marginStart="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="About"
-                android:src="@android:drawable/ic_menu_info_details"
-                android:tint="#94A3B8" />
-
         </LinearLayout>
 
-        <!-- 2. Today's Collections Summary Block -->
+        <!-- 2. Today's Collections Card -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:background="#1B2940"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Today's Collections"
-                android:textAllCaps="true"
-                android:textColor="#94A3B8"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/tvTodayTotal"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Rs. 0.00"
-                    android:textColor="#19C878"
-                    android:textSize="28sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvTodayCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="#2A3A54"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="4dp"
-                    android:text="0 Payments"
-                    android:textColor="#FFFFFF"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- 3. Hero Last Payment Card -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="#1B2940"
+            android:background="#182436"
             android:orientation="vertical"
             android:padding="20dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Aakhri Wasooli (Last Payment)"
-                android:textColor="#94A3B8"
-                android:textSize="13sp"
-                android:textStyle="bold" />
+                android:text="Today's Collections"
+                android:textColor="#A7B7CD"
+                android:textSize="13sp" />
 
             <TextView
-                android:id="@+id/tvHeroAmount"
+                android:id="@+id/tvTodayTotal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="Rs. 0"
+                android:text="Rs. 0.00"
                 android:textColor="#FFFFFF"
                 android:textSize="32sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tvHeroDetails"
+                android:id="@+id/tvTodayStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Waiting for your next payment..."
-                android:textColor="#43C7FF"
-                android:textSize="14sp" />
+                android:layout_marginTop="6dp"
+                android:text="🕒 No payments received yet today"
+                android:textColor="#A7B7CD"
+                android:textSize="13sp" />
 
+            <!-- Horizontal Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="16dp"
+                android:background="#2A3A54" />
+
+            <!-- Bottom Row (Transactions & Last payment) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/btnReplayHero"
+                <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="52dp"
-                    android:layout_marginEnd="6dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:backgroundTint="#2A3A54"
-                    android:drawableStart="@drawable/ic_replay"
-                    android:drawablePadding="8dp"
-                    android:text="Replay Audio"
-                    android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/btnReceiptHero"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Transactions"
+                        android:textColor="#A7B7CD"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tvTodayCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="0"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="52dp"
-                    android:layout_marginStart="6dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:backgroundTint="#19C878"
-                    android:drawableStart="@drawable/ic_receipt"
-                    android:drawablePadding="8dp"
-                    android:text="Send Receipt"
-                    android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Last payment"
+                        android:textColor="#A7B7CD"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tvLastPaymentValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="—"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <!-- 4. Quick Merchant Tools (2x2 Grid) -->
+        <!-- 3. Collect Payment Section -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="20dp"
+            android:text="Collect Payment"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <!-- Receive Payment Primary Action Button -->
+        <Button
+            android:id="@+id/btnReceivePayment"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="#19C878"
+            android:text="Receive Payment"
+            android:textAllCaps="false"
+            android:textColor="#0B1220"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <!-- Secondary Buttons Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnReplayHero"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="#202E44"
+                android:text="Replay Audio"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnReceiptHero"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:backgroundTint="#202E44"
+                android:text="Send Receipt"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- 4. Merchant Tools Grid -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="20dp"
             android:text="Merchant Tools"
-            android:textAllCaps="true"
-            android:textColor="#94A3B8"
-            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <!-- Row 1 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
-            <!-- Card 1: Customer QR -->
-            <LinearLayout
-                android:id="@+id/cardCustomerQr"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
-                android:layout_weight="1"
-                android:background="#1B2940"
-                android:clickable="true"
-                android:focusable="true"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:contentDescription="QR Icon"
-                    android:src="@drawable/ic_qr" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Customer QR"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="Pre-fill &amp; receive payment"
-                    android:textColor="#94A3B8"
-                    android:textSize="11sp" />
-
-            </LinearLayout>
-
-            <!-- Card 2: Voice Munshi -->
+            <!-- Card 1: Daily Summary -->
             <LinearLayout
                 android:id="@+id/cardVoiceMunshi"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
                 android:layout_weight="1"
-                android:background="#1B2940"
+                android:background="#182436"
                 android:clickable="true"
                 android:focusable="true"
                 android:orientation="vertical"
                 android:padding="16dp">
 
                 <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
                     android:contentDescription="Daily Summary Icon"
                     android:src="@drawable/ic_analytics" />
 
@@ -275,37 +284,28 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Review daily collections"
-                    android:textColor="#94A3B8"
-                    android:textSize="11sp" />
+                    android:text="Review collections"
+                    android:textColor="#A7B7CD"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
-        </LinearLayout>
-
-        <!-- Row 2 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="horizontal">
-
-            <!-- Card 3: PDF Ledger -->
+            <!-- Card 2: PDF Ledger -->
             <LinearLayout
                 android:id="@+id/cardPdfLedger"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
+                android:layout_marginStart="6dp"
                 android:layout_weight="1"
-                android:background="#1B2940"
+                android:background="#182436"
                 android:clickable="true"
                 android:focusable="true"
                 android:orientation="vertical"
                 android:padding="16dp">
 
                 <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
                     android:contentDescription="PDF Icon"
                     android:src="@drawable/ic_pdf" />
 
@@ -322,9 +322,56 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Export EOD records"
-                    android:textColor="#94A3B8"
-                    android:textSize="11sp" />
+                    android:text="Export records"
+                    android:textColor="#A7B7CD"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Row 2 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <!-- Card 3: Customer QR -->
+            <LinearLayout
+                android:id="@+id/cardCustomerQr"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:background="#182436"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:contentDescription="QR Icon"
+                    android:src="@drawable/ic_qr" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Customer QR"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Prepare payment"
+                    android:textColor="#A7B7CD"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
@@ -335,15 +382,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:layout_weight="1"
-                android:background="#1B2940"
+                android:background="#182436"
                 android:clickable="true"
                 android:focusable="true"
                 android:orientation="vertical"
                 android:padding="16dp">
 
                 <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
                     android:contentDescription="Speaker Icon"
                     android:src="@drawable/ic_speaker" />
 
@@ -360,57 +407,68 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Audio keep-alive active"
-                    android:textColor="#94A3B8"
-                    android:textSize="11sp" />
+                    android:text="Audio settings"
+                    android:textColor="#A7B7CD"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <!-- Spacer -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <!-- 5. Quiet Account Utility Footer -->
+        <!-- 5. Subscription Card Bar -->
         <LinearLayout
+            android:id="@+id/cardSubscription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="12dp"
+            android:background="#182436"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:padding="16dp">
 
             <TextView
-                android:id="@+id/tvFooterDeviceInfo"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="ID: Loading... • 29 Days Left"
-                android:textColor="#64748B"
-                android:textSize="11sp" />
-
-            <Button
-                android:id="@+id/btnFooterEnterKey"
-                style="?attr/borderlessButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Enter Key"
-                android:textAllCaps="false"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:gravity="center"
+                android:text="✓"
                 android:textColor="#19C878"
-                android:textSize="12sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/btnFooterSupport"
-                style="?attr/borderlessButtonStyle"
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Subscription"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvSubscriptionDays"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="29 days remaining"
+                    android:textColor="#A7B7CD"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Support"
-                android:textAllCaps="false"
-                android:textColor="#43C7FF"
-                android:textSize="12sp"
+                android:text="›"
+                android:textColor="#A7B7CD"
+                android:textSize="22sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
