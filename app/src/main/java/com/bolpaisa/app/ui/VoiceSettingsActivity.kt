@@ -2,12 +2,18 @@ package com.bolpaisa.app.ui
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.media.AudioDeviceInfo
+import android.media.AudioManager
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Switch
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bolpaisa.app.R
 import com.bolpaisa.app.audio.AudioPlayerManager
@@ -42,6 +48,7 @@ class VoiceSettingsActivity : AppCompatActivity() {
         val rbSindhi = findViewById<RadioButton>(R.id.rbSindhi)
         val btnTestAlert = findViewById<Button>(R.id.btnTestAlert)
         val switchBtKeepAlive = findViewById<Switch>(R.id.switchBtKeepAlive)
+        val btnPairBluetooth = findViewById<Button>(R.id.btnPairBluetooth)
 
         btnBack.setOnClickListener { finish() }
 
@@ -81,8 +88,63 @@ class VoiceSettingsActivity : AppCompatActivity() {
             FeedbackHelper.showSuccess(findViewById(android.R.id.content), "Speaker keep-alive boost $status")
         }
 
+        audioPlayerManager.onPlaybackStateChangeListener = { isPlaying ->
+            runOnUiThread {
+                if (isPlaying) {
+                    btnTestAlert.text = "Playing Announcement..."
+                    btnTestAlert.isEnabled = false
+                } else {
+                    btnTestAlert.text = "Play Sample Voice Alert"
+                    btnTestAlert.isEnabled = true
+                }
+            }
+        }
+
         btnTestAlert.setOnClickListener {
             playSampleAlert()
+        }
+
+        btnPairBluetooth.setOnClickListener {
+            try {
+                startActivity(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))
+            } catch (e: Exception) {
+                FeedbackHelper.showError(findViewById(android.R.id.content), "Cannot open Bluetooth settings")
+            }
+        }
+
+        updateBluetoothStatus()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateBluetoothStatus()
+    }
+
+    private fun updateBluetoothStatus() {
+        val tvBtConnectionStatus = findViewById<TextView>(R.id.tvBtConnectionStatus) ?: return
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+        var connectedBtName: String? = null
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val outputs = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
+            for (device in outputs) {
+                if (device.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP || device.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO) {
+                    val name = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        device.productName?.toString()
+                    } else null
+                    connectedBtName = name ?: "Bluetooth Counter Speaker"
+                    break
+                }
+            }
+        }
+
+        if (connectedBtName != null) {
+            tvBtConnectionStatus.text = "● Connected: $connectedBtName"
+            tvBtConnectionStatus.setTextColor(Color.parseColor("#10B981"))
+        } else {
+            tvBtConnectionStatus.text = "● Phone Speaker (No Bluetooth Connected)"
+            tvBtConnectionStatus.setTextColor(Color.parseColor("#94A3B8"))
         }
     }
 
@@ -102,10 +164,8 @@ class VoiceSettingsActivity : AppCompatActivity() {
         val wasoolRes = resources.getIdentifier("wasool_huay", "raw", packageName)
         if (wasoolRes != 0) tokens.add(wasoolRes)
 
-        if (tokens.isNotEmpty()) {
-            audioPlayerManager.playSequence(tokens)
-            FeedbackHelper.showInfo(findViewById(android.R.id.content), "Playing sample payment announcement...")
-        }
+        FeedbackHelper.showInfo(findViewById(android.R.id.content), "Playing sample payment announcement...")
+        audioPlayerManager.playSequence(tokens, "Easypaisa par Rs. 150 wasool huay")
     }
 
     override fun onDestroy() {

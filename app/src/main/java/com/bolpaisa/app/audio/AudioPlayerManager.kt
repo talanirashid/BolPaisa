@@ -3,27 +3,35 @@ package com.bolpaisa.app.audio
 import android.content.Context
 import android.content.res.AssetFileDescriptor
 import android.media.AudioAttributes
+import android.media.AudioManager
 import android.media.MediaPlayer
+import android.media.RingtoneManager
 import android.os.PowerManager
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import androidx.annotation.RawRes
 import java.util.LinkedList
+import java.util.Locale
 import java.util.Queue
 
-class AudioPlayerManager(private val context: Context) {
+class AudioPlayerManager(private val context: Context) : TextToSpeech.OnInitListener {
 
-    private val tag = "AudioPlayerManager"
+    private val tag = "BolPaisaAudio"
 
-    // Primary and secondary players for the ping-pong pipeline
     private var currentPlayer: MediaPlayer? = null
     private var nextPlayer: MediaPlayer? = null
 
-    // Track state of current sequence
     private val sequenceQueue: Queue<Int> = LinkedList()
     private val paymentJobsQueue: Queue<List<Int>> = LinkedList()
 
     private var isPlaying = false
     private var wakeLock: PowerManager.WakeLock? = null
+    private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+    private var tts: TextToSpeech? = null
+    private var isTtsReady = false
+
+    var onPlaybackStateChangeListener: ((Boolean) -> Unit)? = null
 
     init {
         val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
@@ -31,56 +39,91 @@ class AudioPlayerManager(private val context: Context) {
             PowerManager.PARTIAL_WAKE_LOCK,
             "BolPaisa:AudioPlaybackWakeLock"
         )
+        try {
+            tts = TextToSpeech(context, this)
+        } catch (e: Exception) {
+            Log.e(tag, "Failed to initialize TTS engine: ${e.message}")
+        }
     }
 
-    /**
-     * Enqueues an entire sequence of resource IDs (e.g. [ding, easypaisa, char, sau, rupay])
-     * and begins playback if the engine is currently idle.
-     */
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            val result = tts?.setLanguage(Locale("ur", "PK"))
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                tts?.setLanguage(Locale.ENGLISH)
+            }
+            isTtsReady = true
+        }
+    }
+
+    fun ensureAudibleVolume() {
+        try {
+            val maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+            val currentVol = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+            val targetVol = (maxVol * 0.75f).toInt()
+            if (currentVol < targetVol) {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, targetVol, 0)
+                Log.i(tag, "Boosted STREAM_MUSIC volume from $currentVol to $targetVol")
+            }
+        } catch (e: Exception) {
+            Log.w(tag, "Volume guard warning: ${e.message}")
+        }
+    }
+
     @Synchronized
-    fun playSequence(rawResIds: List<Int>) {
-        if (rawResIds.isEmpty()) return
+    fun playSequence(rawResIds: List<Int>, fallbackText: String = "Rs. 150 received via Easypaisa") {
+        ensureAudibleVolume()
+
+        if (rawResIds.isEmpty()) {
+            playFallbackSpeech(fallbackText)
+            return
+        }
 
         paymentJobsQueue.offer(rawResIds)
 
         if (!isPlaying) {
-            processNextJob()
+            processNextJob(fallbackText)
         }
     }
 
     @Synchronized
-    private fun processNextJob() {
+    private fun processNextJob(fallbackText: String = "Payment received") {
         val nextJob = paymentJobsQueue.poll()
         if (nextJob == null) {
             isPlaying = false
             releaseWakeLock()
+            notifyState(false)
             return
         }
 
         isPlaying = true
+        notifyState(true)
         acquireWakeLock()
 
         sequenceQueue.clear()
         sequenceQueue.addAll(nextJob)
 
-        startPlaybackPipeline()
+        startPlaybackPipeline(fallbackText)
     }
 
-    /**
-     * Bootstraps the primary and secondary players for gapless chaining.
-     */
-    private fun startPlaybackPipeline() {
-        val firstResId = sequenceQueue.poll() ?: run {
-            processNextJob()
+    private fun notifyState(playing: Boolean) {
+        onPlaybackStateChangeListener?.invoke(playing)
+    }
+
+    private fun startPlaybackPipeline(fallbackText: String) {
+        val firstResId = sequenceQueue.poll()
+        if (firstResId == null) {
+            processNextJob(fallbackText)
             return
         }
 
-        currentPlayer = createConfiguredPlayer(firstResId) ?: run {
-            processNextJob()
+        currentPlayer = createConfiguredPlayer(firstResId)
+        if (currentPlayer == null) {
+            Log.w(tag, "Raw audio res $firstResId missing. Falling back to TTS/Chime speech.")
+            playFallbackSpeech(fallbackText)
             return
         }
 
-        // Prepare the secondary player if more clips exist in this sequence
         prepareNextInSequence()
 
         currentPlayer?.setOnCompletionListener { mp ->
@@ -89,13 +132,10 @@ class AudioPlayerManager(private val context: Context) {
             nextPlayer = null
 
             if (currentPlayer != null) {
-                // Secondary player automatically transitioned via setNextMediaPlayer;
-                // Hook completion to continue the chain
-                attachCompletionHandler(currentPlayer)
+                attachCompletionHandler(currentPlayer, fallbackText)
                 prepareNextInSequence()
             } else {
-                // Current payment sequence finished
-                processNextJob()
+                processNextJob(fallbackText)
             }
         }
 
@@ -108,40 +148,37 @@ class AudioPlayerManager(private val context: Context) {
         nextPlayer = createConfiguredPlayer(nextResId)
         if (nextPlayer != null && currentPlayer != null) {
             try {
-                // Hardware-level gapless transition
                 currentPlayer?.setNextMediaPlayer(nextPlayer)
             } catch (e: Exception) {
-                Log.w(tag, "Gapless chaining failed, falling back to sequential listener: ${e.message}")
+                Log.w(tag, "Gapless chaining failed: ${e.message}")
             }
         }
     }
 
-    private fun attachCompletionHandler(player: MediaPlayer?) {
+    private fun attachCompletionHandler(player: MediaPlayer?, fallbackText: String) {
         player?.setOnCompletionListener { mp ->
             mp.release()
             currentPlayer = nextPlayer
             nextPlayer = null
 
             if (currentPlayer != null) {
-                attachCompletionHandler(currentPlayer)
+                attachCompletionHandler(currentPlayer, fallbackText)
                 prepareNextInSequence()
             } else {
-                processNextJob()
+                processNextJob(fallbackText)
             }
         }
     }
 
-    /**
-     * Instantiates and configures a MediaPlayer pointing directly to an uncompressed/Ogg raw resource.
-     */
     private fun createConfiguredPlayer(@RawRes rawResId: Int): MediaPlayer? {
+        if (rawResId == 0) return null
         val player = MediaPlayer()
         return try {
             val afd: AssetFileDescriptor = context.resources.openRawResourceFd(rawResId) ?: return null
 
             player.setAudioAttributes(
                 AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION) // Cut through background noise
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                     .build()
             )
@@ -157,10 +194,27 @@ class AudioPlayerManager(private val context: Context) {
         }
     }
 
+    fun playFallbackSpeech(text: String) {
+        ensureAudibleVolume()
+        notifyState(true)
+        if (isTtsReady && tts != null) {
+            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "BolPaisaTts")
+        } else {
+            try {
+                val notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+                val r = RingtoneManager.getRingtone(context, notification)
+                r.play()
+            } catch (e: Exception) {
+                Log.e(tag, "Ringtone fallback error: ${e.message}")
+            }
+        }
+        notifyState(false)
+    }
+
     private fun acquireWakeLock() {
         try {
             if (wakeLock?.isHeld == false) {
-                wakeLock?.acquire(15_000) // 15-second safety limit per payment announcement
+                wakeLock?.acquire(15_000)
             }
         } catch (e: Exception) {
             Log.w(tag, "WakeLock acquisition warning: ${e.message}")
@@ -177,9 +231,6 @@ class AudioPlayerManager(private val context: Context) {
         }
     }
 
-    /**
-     * Emergency reset: stops all audio, clears queued payments, and frees native audio memory.
-     */
     @Synchronized
     fun release() {
         sequenceQueue.clear()
@@ -193,11 +244,15 @@ class AudioPlayerManager(private val context: Context) {
             nextPlayer?.stop()
             nextPlayer?.release()
             nextPlayer = null
+
+            tts?.stop()
+            tts?.shutdown()
         } catch (e: Exception) {
             Log.e(tag, "Error releasing MediaPlayers", e)
         }
 
         isPlaying = false
         releaseWakeLock()
+        notifyState(false)
     }
 }
