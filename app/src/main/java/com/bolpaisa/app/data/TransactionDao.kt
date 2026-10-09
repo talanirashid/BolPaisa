@@ -13,6 +13,9 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions ORDER BY timestamp DESC")
     fun getAllTransactions(): Flow<List<TransactionEntity>>
 
+    @Query("SELECT * FROM transactions WHERE timestamp >= :startOfDay AND timestamp <= :endOfDay ORDER BY timestamp DESC")
+    fun getTodayTransactionsFlow(startOfDay: Long, endOfDay: Long): Flow<List<TransactionEntity>>
+
     @Query("SELECT * FROM transactions ORDER BY timestamp DESC LIMIT 1")
     suspend fun getLatestTransaction(): TransactionEntity?
 

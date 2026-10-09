@@ -14,10 +14,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bolpaisa.app.R
 import com.bolpaisa.app.audio.AudioPlayerManager
 import com.bolpaisa.app.audio.NumberToWordsConverter
 import com.bolpaisa.app.data.AppDatabase
+import com.bolpaisa.app.data.TransactionEntity
 import com.bolpaisa.app.licensing.MerchantProfileManager
 import com.bolpaisa.app.licensing.SubscriptionManager
 import com.bolpaisa.app.reports.PdfReportGenerator
@@ -35,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var profileManager: MerchantProfileManager
     private lateinit var database: AppDatabase
     private lateinit var audioPlayerManager: AudioPlayerManager
+    private lateinit var transactionAdapter: TransactionAdapter
     private var activeShopSetupDialog: ShopSetupDialog? = null
 
     private val selectLogoLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -69,6 +73,16 @@ class MainActivity : AppCompatActivity() {
 
         // Subscription Card
         val cardSubscription = findViewById<View>(R.id.cardSubscription)
+
+        // RecyclerView Today's Payment History
+        val rvTodayTransactions = findViewById<RecyclerView>(R.id.rvTodayTransactions)
+        val tvEmptyHistory = findViewById<TextView>(R.id.tvEmptyHistory)
+        rvTodayTransactions.layoutManager = LinearLayoutManager(this)
+
+        transactionAdapter = TransactionAdapter { trx ->
+            replaySpecificPayment(trx)
+        }
+        rvTodayTransactions.adapter = transactionAdapter
 
         updateStatusDisplay(tvStatusPill)
 
@@ -109,6 +123,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         checkAndPromptShopSetup()
+        observeTodayTransactions(tvEmptyHistory)
     }
 
     private fun checkAndPromptShopSetup() {
@@ -131,6 +146,29 @@ class MainActivity : AppCompatActivity() {
         observeDashboardData()
     }
 
+    private fun observeTodayTransactions(tvEmptyHistory: TextView) {
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val startOfDay = calendar.timeInMillis
+        val endOfDay = System.currentTimeMillis() + 86400000L
+
+        lifecycleScope.launch {
+            database.transactionDao().getTodayTransactionsFlow(startOfDay, endOfDay).collect { list ->
+                if (list.isNotEmpty()) {
+                    tvEmptyHistory.visibility = View.GONE
+                    transactionAdapter.updateTransactions(list)
+                } else {
+                    tvEmptyHistory.visibility = View.VISIBLE
+                    transactionAdapter.updateTransactions(emptyList())
+                }
+            }
+        }
+    }
+
     private fun observeDashboardData() {
         val tvTodayTotal = findViewById<TextView>(R.id.tvTodayTotal)
         val tvTodayStatus = findViewById<TextView>(R.id.tvTodayStatus)
@@ -145,7 +183,7 @@ class MainActivity : AppCompatActivity() {
                 set(Calendar.MILLISECOND, 0)
             }
             val startOfDay = calendar.timeInMillis
-            val endOfDay = System.currentTimeMillis()
+            val endOfDay = System.currentTimeMillis() + 86400000L
 
             val latest = database.transactionDao().getLatestTransaction()
             val todayTotal = database.transactionDao().getDailyTotal(startOfDay, endOfDay) ?: 0.0
@@ -190,30 +228,34 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun replaySpecificPayment(trx: TransactionEntity) {
+        val tokens = mutableListOf<Int>()
+        val dingRes = resources.getIdentifier("ding", "raw", packageName)
+        if (dingRes != 0) tokens.add(dingRes)
+
+        val providerResName = if (trx.provider.equals("JazzCash", true)) "jazzcash_par" else "easypaisa_par"
+        val providerRes = resources.getIdentifier(providerResName, "raw", packageName)
+        if (providerRes != 0) tokens.add(providerRes)
+
+        tokens.addAll(NumberToWordsConverter.getUrduResIds(this, trx.amount))
+
+        val rupayRes = resources.getIdentifier("rupay", "raw", packageName)
+        if (rupayRes != 0) tokens.add(rupayRes)
+
+        val wasoolRes = resources.getIdentifier("wasool_huay", "raw", packageName)
+        if (wasoolRes != 0) tokens.add(wasoolRes)
+
+        if (tokens.isNotEmpty()) {
+            audioPlayerManager.playSequence(tokens)
+        }
+    }
+
     private fun replayLastPayment() {
         lifecycleScope.launch(Dispatchers.IO) {
             val latest = database.transactionDao().getLatestTransaction()
             withContext(Dispatchers.Main) {
                 if (latest != null) {
-                    val tokens = mutableListOf<Int>()
-                    val dingRes = resources.getIdentifier("ding", "raw", packageName)
-                    if (dingRes != 0) tokens.add(dingRes)
-
-                    val providerResName = if (latest.provider.equals("JazzCash", true)) "jazzcash_par" else "easypaisa_par"
-                    val providerRes = resources.getIdentifier(providerResName, "raw", packageName)
-                    if (providerRes != 0) tokens.add(providerRes)
-
-                    tokens.addAll(NumberToWordsConverter.getUrduResIds(this@MainActivity, latest.amount))
-
-                    val rupayRes = resources.getIdentifier("rupay", "raw", packageName)
-                    if (rupayRes != 0) tokens.add(rupayRes)
-
-                    val wasoolRes = resources.getIdentifier("wasool_huay", "raw", packageName)
-                    if (wasoolRes != 0) tokens.add(wasoolRes)
-
-                    if (tokens.isNotEmpty()) {
-                        audioPlayerManager.playSequence(tokens)
-                    }
+                    replaySpecificPayment(latest)
                 } else {
                     Toast.makeText(this@MainActivity, "No previous transaction to replay.", Toast.LENGTH_SHORT).show()
                 }
@@ -230,7 +272,7 @@ class MainActivity : AppCompatActivity() {
                 set(Calendar.MILLISECOND, 0)
             }
             val startOfDay = calendar.timeInMillis
-            val endOfDay = System.currentTimeMillis()
+            val endOfDay = System.currentTimeMillis() + 86400000L
 
             val total = database.transactionDao().getDailyTotal(startOfDay, endOfDay) ?: 0.0
             val transactions = database.transactionDao().getMonthlyPayments(startOfDay, endOfDay)
