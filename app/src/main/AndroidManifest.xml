@@ -40,6 +40,7 @@
 
         <activity android:name=".ui.LedgerActivity" />
         <activity android:name=".ui.SetupActivity" />
+        <activity android:name=".ui.AboutActivity" />
 
         <!-- Ongoing Sticky Service -->
         <service
