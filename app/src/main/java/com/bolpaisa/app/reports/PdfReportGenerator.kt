@@ -11,10 +11,12 @@ import android.graphics.pdf.PdfDocument
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.view.View
 import android.widget.Toast
 import com.bolpaisa.app.R
 import com.bolpaisa.app.data.TransactionEntity
 import com.bolpaisa.app.licensing.MerchantProfileManager
+import com.bolpaisa.app.util.FeedbackHelper
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
@@ -118,6 +120,7 @@ object PdfReportGenerator {
 
     private fun savePdfFile(context: Context, pdfDocument: PdfDocument, fileName: String) {
         try {
+            val successMessage = "PDF Report saved to Documents/BolPaisa"
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val values = ContentValues().apply {
                     put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
@@ -130,7 +133,7 @@ object PdfReportGenerator {
                     if (outputStream != null) {
                         pdfDocument.writeTo(outputStream)
                         outputStream.close()
-                        Toast.makeText(context, "PDF Report saved to Documents/BolPaisa", Toast.LENGTH_LONG).show()
+                        showNotification(context, successMessage)
                     }
                 }
             } else {
@@ -140,13 +143,28 @@ object PdfReportGenerator {
                 val fos = FileOutputStream(file)
                 pdfDocument.writeTo(fos)
                 fos.close()
-                Toast.makeText(context, "PDF saved to Documents/BolPaisa/$fileName", Toast.LENGTH_LONG).show()
+                showNotification(context, successMessage)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(context, "Failed to save PDF: ${e.message}", Toast.LENGTH_SHORT).show()
+            showNotification(context, "Failed to save PDF: ${e.message}", isError = true)
         } finally {
             pdfDocument.close()
         }
+    }
+
+    private fun showNotification(context: Context, message: String, isError: Boolean = false) {
+        if (context is android.app.Activity) {
+            val view = context.findViewById<View>(android.R.id.content)
+            if (view != null) {
+                if (isError) {
+                    FeedbackHelper.showError(view, message)
+                } else {
+                    FeedbackHelper.showSuccess(view, message)
+                }
+                return
+            }
+        }
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 }
