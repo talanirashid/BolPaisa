@@ -1,6 +1,7 @@
 package com.bolpaisa.app.ui
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageButton
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bolpaisa.app.R
 import com.bolpaisa.app.audio.AudioPlayerManager
 import com.bolpaisa.app.audio.NumberToWordsConverter
+import com.bolpaisa.app.util.LocaleHelper
 
 class VoiceSettingsActivity : AppCompatActivity() {
 
@@ -21,6 +23,10 @@ class VoiceSettingsActivity : AppCompatActivity() {
         const val PREFS_NAME = "secure_voice_prefs"
         const val KEY_VOICE_LANGUAGE = "key_voice_language" // "URDU", "ENGLISH", "SINDHI"
         const val KEY_BT_KEEP_ALIVE = "key_bt_keep_alive"
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.setLocale(newBase, LocaleHelper.getLanguage(newBase)))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,24 +45,34 @@ class VoiceSettingsActivity : AppCompatActivity() {
 
         btnBack.setOnClickListener { finish() }
 
-        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val currentLang = prefs.getString(KEY_VOICE_LANGUAGE, "URDU") ?: "URDU"
-        when (currentLang) {
-            "ENGLISH" -> rbEnglish.isChecked = true
-            "SINDHI" -> rbSindhi.isChecked = true
+        val activeLangCode = LocaleHelper.getLanguage(this)
+        when (activeLangCode) {
+            "en" -> rbEnglish.isChecked = true
+            "sd" -> rbSindhi.isChecked = true
             else -> rbUrdu.isChecked = true
         }
 
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         switchBtKeepAlive.isChecked = prefs.getBoolean(KEY_BT_KEEP_ALIVE, true)
 
         rgLanguage.setOnCheckedChangeListener { _, checkedId ->
-            val selected = when (checkedId) {
-                R.id.rbEnglish -> "ENGLISH"
-                R.id.rbSindhi -> "SINDHI"
-                else -> "URDU"
+            val (langCode, langName) = when (checkedId) {
+                R.id.rbEnglish -> Pair("en", "ENGLISH")
+                R.id.rbSindhi -> Pair("sd", "SINDHI")
+                else -> Pair("ur", "URDU")
             }
-            prefs.edit().putString(KEY_VOICE_LANGUAGE, selected).apply()
-            Toast.makeText(this, "Language updated to $selected", Toast.LENGTH_SHORT).show()
+
+            if (LocaleHelper.getLanguage(this) != langCode) {
+                LocaleHelper.setLocale(this, langCode)
+                prefs.edit().putString(KEY_VOICE_LANGUAGE, langName).apply()
+                Toast.makeText(this, "Language set to $langName", Toast.LENGTH_SHORT).show()
+
+                val intent = Intent(this, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
+                startActivity(intent)
+                finish()
+            }
         }
 
         switchBtKeepAlive.setOnCheckedChangeListener { _, isChecked ->

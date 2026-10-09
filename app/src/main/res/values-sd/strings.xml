@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">بول پئسا</string>
+    <string name="app_subtitle">ڊجيٽل سائونڊ باڪس</string>
+    <string name="todays_collections">اڄ جي ڪل وصولي</string>
+    <string name="no_payments_today">🕒 اڄ ڪا به رقم موصول نه ٿي آهي</string>
+    <string name="transactions">ٽرانزيڪشنز</string>
+    <string name="last_payment">آخري وصولي</string>
+    <string name="collect_payment">رقم وصول ڪريو</string>
+    <string name="receive_payment">پيمنٽ وصول ڪريو</string>
+    <string name="replay_audio">آواز ٻيهر ٻڌو</string>
+    <string name="send_receipt">رپٽ موڪليو</string>
+    <string name="merchant_tools">دڪاندار جا ٽولز</string>
+    <string name="summary">سمري</string>
+    <string name="summary_subtitle">وصولي ۽ پي ڊي ايف</string>
+    <string name="payment_history">پيمنٽ هسٽري</string>
+    <string name="payment_history_subtitle">سڀ ٽرانزيڪشنز</string>
+    <string name="customer_qr">ڪسٽمر ڪيو آر</string>
+    <string name="customer_qr_subtitle">ڊائنامڪ پيمنٽ ڪيو آر</string>
+    <string name="voice_and_audio">آواز ۽ آڊيو</string>
+    <string name="voice_and_audio_subtitle">ٻوليون ۽ اسپيڪر</string>
+    <string name="subscription">سبسڪرپشن</string>
+    <string name="days_remaining">%d ڏينهن باقي آهن</string>
+    <string name="status_active">✓ فعال</string>
+    <string name="todays_payment_history">اڄ جي پيمنٽ هسٽري</string>
+    <string name="no_payments_announced">اڄ ڪا به پيمنٽ انائونس نه ٿي آهي.</string>
+</resources>

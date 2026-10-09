@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">بول پیسہ</string>
+    <string name="app_subtitle">ڈیجیٹل ساؤنڈ باکس</string>
+    <string name="todays_collections">آج کی کل وصولی</string>
+    <string name="no_payments_today">🕒 آج کوئی رقم موصول نہیں ہوئی</string>
+    <string name="transactions">ٹرانزیکشنز</string>
+    <string name="last_payment">آخری وصولی</string>
+    <string name="collect_payment">رقم وصول کریں</string>
+    <string name="receive_payment">پیمنٹ وصول کریں</string>
+    <string name="replay_audio">آواز دوبارہ سنیں</string>
+    <string name="send_receipt">رسید بھیجیں</string>
+    <string name="merchant_tools">دکاندار کے ٹولز</string>
+    <string name="summary">سمری</string>
+    <string name="summary_subtitle">وصولی اور پی ڈی ایف</string>
+    <string name="payment_history">پیمنٹ ہسٹری</string>
+    <string name="payment_history_subtitle">تمام ٹرانزیکشنز</string>
+    <string name="customer_qr">کسٹمر کیو آر</string>
+    <string name="customer_qr_subtitle">ڈائنامک پیمنٹ کیو آر</string>
+    <string name="voice_and_audio">آواز اور آڈیو</string>
+    <string name="voice_and_audio_subtitle">زبانیں اور سپیکر</string>
+    <string name="subscription">سبسکرپشن</string>
+    <string name="days_remaining">%d دن باقی ہیں</string>
+    <string name="status_active">✓ فعال</string>
+    <string name="todays_payment_history">آج کی پیمنٹ ہسٹری</string>
+    <string name="no_payments_announced">آج کوئی پیمنٹ اناؤنس نہیں ہوئی۔</string>
+</resources>

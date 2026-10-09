@@ -1,6 +1,7 @@
 package com.bolpaisa.app.ui
 
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -27,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
+import com.bolpaisa.app.util.LocaleHelper
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -39,6 +41,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var audioPlayerManager: AudioPlayerManager
     private lateinit var transactionAdapter: TransactionAdapter
     private var activeShopSetupDialog: ShopSetupDialog? = null
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.setLocale(newBase, LocaleHelper.getLanguage(newBase)))
+    }
 
     private val selectLogoLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
