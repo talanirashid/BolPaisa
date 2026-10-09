@@ -14,9 +14,12 @@
 
         <!-- Logo Mark -->
         <ImageView
+            android:id="@+id/ivAboutLogo"
             android:layout_width="90dp"
             android:layout_height="90dp"
             android:layout_marginTop="12dp"
+            android:clickable="true"
+            android:focusable="true"
             android:contentDescription="BolPaisa Logo"
             android:src="@drawable/logo_mark" />
 

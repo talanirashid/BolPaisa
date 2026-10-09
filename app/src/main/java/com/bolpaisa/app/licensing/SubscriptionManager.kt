@@ -71,9 +71,9 @@ class SubscriptionManager(context: Context) {
     fun getDeviceId(): String = deviceId
 
     /**
-     * Attempts to activate the app with an 8-character unlock code.
+     * Attempts to activate the app with an 8-character unlock code across supported durations (30, 90, 365 days).
      */
-    fun activateLicense(enteredCode: String, planDays: Int = 30): Boolean {
+    fun activateLicense(enteredCode: String): Boolean {
         checkClockTampering()
         val cleanCode = enteredCode.replace("-", "").trim().uppercase()
 
@@ -82,19 +82,22 @@ class SubscriptionManager(context: Context) {
             return false // Key already used
         }
 
-        if (LicenseValidator.verifyKey(deviceId, cleanCode, planDays)) {
-            val updatedBurnedKeys = burnedKeys.toMutableSet().apply { add(cleanCode) }
-            
-            val currentExpiry = prefs.getLong(KEY_EXPIRY_TIME, System.currentTimeMillis())
-            val baseTime = if (currentExpiry > System.currentTimeMillis()) currentExpiry else System.currentTimeMillis()
-            val newExpiry = baseTime + TimeUnit.DAYS.toMillis(planDays.toLong())
+        val supportedDurations = listOf(30, 90, 365)
+        for (duration in supportedDurations) {
+            if (LicenseValidator.verifyKey(deviceId, cleanCode, duration)) {
+                val updatedBurnedKeys = burnedKeys.toMutableSet().apply { add(cleanCode) }
 
-            prefs.edit()
-                .putStringSet(KEY_BURNED_KEYS, updatedBurnedKeys)
-                .putLong(KEY_EXPIRY_TIME, newExpiry)
-                .apply()
+                val currentExpiry = prefs.getLong(KEY_EXPIRY_TIME, System.currentTimeMillis())
+                val baseTime = if (currentExpiry > System.currentTimeMillis()) currentExpiry else System.currentTimeMillis()
+                val newExpiry = baseTime + TimeUnit.DAYS.toMillis(duration.toLong())
 
-            return true
+                prefs.edit()
+                    .putStringSet(KEY_BURNED_KEYS, updatedBurnedKeys)
+                    .putLong(KEY_EXPIRY_TIME, newExpiry)
+                    .apply()
+
+                return true
+            }
         }
 
         return false
