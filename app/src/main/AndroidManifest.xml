@@ -42,6 +42,10 @@
         <activity android:name=".ui.SetupActivity" android:exported="true" />
         <activity android:name=".ui.AboutActivity" android:exported="true" />
         <activity android:name=".ui.OnboardingActivity" android:exported="true" />
+        <activity android:name=".ui.QrGeneratorActivity" android:exported="true" />
+        <activity android:name=".ui.SubscriptionActivity" android:exported="true" />
+        <activity android:name=".ui.SummaryActivity" android:exported="true" />
+        <activity android:name=".ui.VoiceSettingsActivity" android:exported="true" />
 
         <!-- Ongoing Sticky Service -->
         <service

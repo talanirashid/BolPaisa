@@ -18,21 +18,12 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <!-- Logo Container Box -->
-            <LinearLayout
+            <!-- Logo ImageView -->
+            <ImageView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:background="#FFFFFF"
-                android:gravity="center"
-                android:padding="6dp">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="BolPaisa Logo"
-                    android:src="@drawable/logo_mark" />
-
-            </LinearLayout>
+                android:contentDescription="BolPaisa Logo"
+                android:src="@drawable/logo_mark" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -50,9 +41,10 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tvDashboardSubtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Merchant Dashboard"
+                    android:text="Digital Soundbox"
                     android:textColor="#A7B7CD"
                     android:textSize="12sp" />
 
@@ -263,9 +255,9 @@
             android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
-            <!-- Card 1: Daily Summary -->
+            <!-- Card 1: Summary -->
             <LinearLayout
-                android:id="@+id/cardVoiceMunshi"
+                android:id="@+id/cardSummary"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
@@ -279,14 +271,14 @@
                 <ImageView
                     android:layout_width="26dp"
                     android:layout_height="26dp"
-                    android:contentDescription="Daily Summary Icon"
+                    android:contentDescription="Summary Icon"
                     android:src="@drawable/ic_analytics" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Daily Summary"
+                    android:text="Summary"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -295,15 +287,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Review collections"
+                    android:text="Collections &amp; PDF"
                     android:textColor="#A7B7CD"
                     android:textSize="12sp" />
 
             </LinearLayout>
 
-            <!-- Card 2: PDF Ledger -->
+            <!-- Card 2: Payment History -->
             <LinearLayout
-                android:id="@+id/cardPdfLedger"
+                android:id="@+id/cardHistory"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
@@ -317,14 +309,14 @@
                 <ImageView
                     android:layout_width="26dp"
                     android:layout_height="26dp"
-                    android:contentDescription="PDF Icon"
+                    android:contentDescription="History Icon"
                     android:src="@drawable/ic_pdf" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="PDF Ledger"
+                    android:text="Payment History"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -333,7 +325,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Export records"
+                    android:text="All transactions"
                     android:textColor="#A7B7CD"
                     android:textSize="12sp" />
 
@@ -380,15 +372,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Prepare payment"
+                    android:text="Dynamic payment QR"
                     android:textColor="#A7B7CD"
                     android:textSize="12sp" />
 
             </LinearLayout>
 
-            <!-- Card 4: Speaker Boost -->
+            <!-- Card 4: Voice & Audio -->
             <LinearLayout
-                android:id="@+id/cardSpeakerBoost"
+                android:id="@+id/cardVoiceSettings"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
@@ -402,14 +394,14 @@
                 <ImageView
                     android:layout_width="26dp"
                     android:layout_height="26dp"
-                    android:contentDescription="Speaker Icon"
+                    android:contentDescription="Voice Icon"
                     android:src="@drawable/ic_speaker" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Speaker Boost"
+                    android:text="Voice &amp; Audio"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -418,7 +410,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Audio settings"
+                    android:text="Languages &amp; Speaker"
                     android:textColor="#A7B7CD"
                     android:textSize="12sp" />
 

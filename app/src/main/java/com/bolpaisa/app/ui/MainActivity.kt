@@ -23,7 +23,6 @@ import com.bolpaisa.app.data.AppDatabase
 import com.bolpaisa.app.data.TransactionEntity
 import com.bolpaisa.app.licensing.MerchantProfileManager
 import com.bolpaisa.app.licensing.SubscriptionManager
-import com.bolpaisa.app.reports.PdfReportGenerator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -59,17 +58,18 @@ class MainActivity : AppCompatActivity() {
         // Top App Bar
         val tvStatusPill = findViewById<TextView>(R.id.tvStatusPill)
         val btnAboutIcon = findViewById<ImageButton>(R.id.btnAboutIcon)
+        val tvDashboardSubtitle = findViewById<TextView>(R.id.tvDashboardSubtitle)
 
         // Collect Payment
         val btnReceivePayment = findViewById<Button>(R.id.btnReceivePayment)
         val btnReplayHero = findViewById<Button>(R.id.btnReplayHero)
         val btnReceiptHero = findViewById<Button>(R.id.btnReceiptHero)
 
-        // Merchant Tools
+        // Merchant Tools Grid
+        val cardSummary = findViewById<View>(R.id.cardSummary)
+        val cardHistory = findViewById<View>(R.id.cardHistory)
         val cardCustomerQr = findViewById<View>(R.id.cardCustomerQr)
-        val cardVoiceMunshi = findViewById<View>(R.id.cardVoiceMunshi)
-        val cardPdfLedger = findViewById<View>(R.id.cardPdfLedger)
-        val cardSpeakerBoost = findViewById<View>(R.id.cardSpeakerBoost)
+        val cardVoiceSettings = findViewById<View>(R.id.cardVoiceSettings)
 
         // Subscription Card
         val cardSubscription = findViewById<View>(R.id.cardSubscription)
@@ -86,12 +86,14 @@ class MainActivity : AppCompatActivity() {
 
         updateStatusDisplay(tvStatusPill)
 
+        tvDashboardSubtitle?.text = profileManager.getShopName().ifEmpty { "Digital Soundbox" }
+
         btnAboutIcon?.setOnClickListener {
             startActivity(Intent(this, AboutActivity::class.java))
         }
 
         btnReceivePayment.setOnClickListener {
-            DynamicQrDialog(this).show()
+            startActivity(Intent(this, QrGeneratorActivity::class.java))
         }
 
         btnReplayHero.setOnClickListener {
@@ -102,24 +104,24 @@ class MainActivity : AppCompatActivity() {
             promptAndSendWhatsAppReceipt()
         }
 
-        cardCustomerQr.setOnClickListener {
-            DynamicQrDialog(this).show()
+        cardSummary?.setOnClickListener {
+            startActivity(Intent(this, SummaryActivity::class.java))
         }
 
-        cardVoiceMunshi.setOnClickListener {
-            runEveningMunshiAndReport()
+        cardHistory?.setOnClickListener {
+            startActivity(Intent(this, LedgerActivity::class.java))
         }
 
-        cardPdfLedger.setOnClickListener {
-            runEveningMunshiAndReport()
+        cardCustomerQr?.setOnClickListener {
+            startActivity(Intent(this, QrGeneratorActivity::class.java))
         }
 
-        cardSpeakerBoost.setOnClickListener {
-            Toast.makeText(this, "Speaker Boost Active: Keeping Bluetooth speaker awake every 25s", Toast.LENGTH_LONG).show()
+        cardVoiceSettings?.setOnClickListener {
+            startActivity(Intent(this, VoiceSettingsActivity::class.java))
         }
 
-        cardSubscription.setOnClickListener {
-            showActivationDialog()
+        cardSubscription?.setOnClickListener {
+            startActivity(Intent(this, SubscriptionActivity::class.java))
         }
 
         checkAndPromptShopSetup()
@@ -143,6 +145,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        val tvDashboardSubtitle = findViewById<TextView>(R.id.tvDashboardSubtitle)
+        tvDashboardSubtitle?.text = profileManager.getShopName().ifEmpty { "Digital Soundbox" }
         observeDashboardData()
     }
 
@@ -224,7 +228,6 @@ class MainActivity : AppCompatActivity() {
             tvStatusPill.text = "● Expired"
             tvStatusPill.setBackgroundColor(android.graphics.Color.parseColor("#7F1D1D"))
             tvStatusPill.setTextColor(android.graphics.Color.parseColor("#EF4444"))
-            showActivationDialog()
         }
     }
 
@@ -259,42 +262,6 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     Toast.makeText(this@MainActivity, "No previous transaction to replay.", Toast.LENGTH_SHORT).show()
                 }
-            }
-        }
-    }
-
-    private fun runEveningMunshiAndReport() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val calendar = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }
-            val startOfDay = calendar.timeInMillis
-            val endOfDay = System.currentTimeMillis() + 86400000L
-
-            val total = database.transactionDao().getDailyTotal(startOfDay, endOfDay) ?: 0.0
-            val transactions = database.transactionDao().getMonthlyPayments(startOfDay, endOfDay)
-
-            withContext(Dispatchers.Main) {
-                val tokens = mutableListOf<Int>()
-                val dingRes = resources.getIdentifier("ding", "raw", packageName)
-                if (dingRes != 0) tokens.add(dingRes)
-
-                tokens.addAll(NumberToWordsConverter.getUrduResIds(this@MainActivity, total.toLong()))
-
-                val rupayRes = resources.getIdentifier("rupay", "raw", packageName)
-                if (rupayRes != 0) tokens.add(rupayRes)
-
-                val wasoolRes = resources.getIdentifier("wasool_huay", "raw", packageName)
-                if (wasoolRes != 0) tokens.add(wasoolRes)
-
-                if (tokens.isNotEmpty()) {
-                    audioPlayerManager.playSequence(tokens)
-                }
-
-                PdfReportGenerator.generateDailyReport(this@MainActivity, transactions, total)
             }
         }
     }
@@ -346,51 +313,6 @@ class MainActivity : AppCompatActivity() {
                 builder.setNegativeButton("Cancel", null)
                 builder.show()
             }
-        }
-    }
-
-    private fun showActivationDialog() {
-        val dialog = android.app.Dialog(this)
-        dialog.setContentView(R.layout.dialog_activation)
-
-        val etCode = dialog.findViewById<EditText>(R.id.etActivationCode)
-        val btnSubmit = dialog.findViewById<Button>(R.id.btnSubmitActivation)
-        val btnCancel = dialog.findViewById<Button>(R.id.btnCancelActivation)
-        val btnWhatsApp = dialog.findViewById<Button>(R.id.btnWhatsAppDeviceId)
-
-        btnCancel.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        btnWhatsApp.setOnClickListener {
-            openWhatsAppSupport()
-        }
-
-        btnSubmit.setOnClickListener {
-            val code = etCode.text.toString().trim()
-            if (subscriptionManager.activateLicense(code)) {
-                Toast.makeText(this, "License activated successfully!", Toast.LENGTH_LONG).show()
-                val tvStatusPill = findViewById<TextView>(R.id.tvStatusPill)
-                updateStatusDisplay(tvStatusPill)
-                dialog.dismiss()
-            } else {
-                Toast.makeText(this, "Invalid or already used activation code.", Toast.LENGTH_LONG).show()
-            }
-        }
-
-        dialog.show()
-    }
-
-    private fun openWhatsAppSupport() {
-        val phoneNumber = "923336366291"
-        val deviceId = subscriptionManager.getDeviceId()
-        val message = "Mene Rs. 150 bhej diye hain.\nMera Device ID: $deviceId\nTrx ID (TID): "
-        val url = "https://wa.me/$phoneNumber?text=${Uri.encode(message)}"
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        try {
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            Toast.makeText(this, "WhatsApp is not installed on this device.", Toast.LENGTH_SHORT).show()
         }
     }
 
