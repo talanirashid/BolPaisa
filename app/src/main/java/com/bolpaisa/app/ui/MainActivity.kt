@@ -54,6 +54,8 @@ class MainActivity : AppCompatActivity() {
         } else {
             tvStatus.text = "Status: EXPIRED\nPlease activate your license to continue voice alerts.\nDevice ID: $deviceId"
             tvStatus.setTextColor(android.graphics.Color.parseColor("#EF4444"))
+            // Automatically prompt activation dialog if expired
+            showActivationDialog(tvStatus)
         }
     }
 
@@ -62,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         builder.setTitle("Activate BolPaisa License")
 
         val input = EditText(this).apply {
-            hint = "Enter 8-digit activation code"
+            hint = "Enter 8-digit activation code (e.g. A3F8-9B2C)"
             setPadding(40, 40, 40, 40)
         }
         builder.setView(input)
@@ -76,6 +78,11 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Invalid or already used activation code.", Toast.LENGTH_LONG).show()
             }
         }
+
+        builder.setNeutralButton("WhatsApp Device ID") { _, _ ->
+            openWhatsAppSupport()
+        }
+
         builder.setNegativeButton("Cancel", null)
         builder.show()
     }
@@ -83,7 +90,7 @@ class MainActivity : AppCompatActivity() {
     private fun openWhatsAppSupport() {
         val phoneNumber = "923336366291"
         val deviceId = subscriptionManager.getDeviceId()
-        val message = "Assalam-o-Alaikum Mehrzaad Technologies, I want to activate BolPaisa.\nDevice ID: $deviceId\nTID / Proof: [Paste Payment TID Here]"
+        val message = "Mene Rs. 150 bhej diye hain.\nMera Device ID: $deviceId\nTrx ID (TID): "
         val url = "https://wa.me/$phoneNumber?text=${Uri.encode(message)}"
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         try {
