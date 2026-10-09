@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0F172A"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="32dp">
+
+    <!-- Slide Icon / Vector Illustration -->
+    <ImageView
+        android:id="@+id/ivSlideIcon"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:contentDescription="Onboarding Slide Illustration"
+        android:src="@drawable/logo_mark" />
+
+    <!-- Slide Title -->
+    <TextView
+        android:id="@+id/tvSlideTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:gravity="center"
+        android:text="Instant Voice Alerts\n(آواز سے تصدیق)"
+        android:textColor="#F8FAFC"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <!-- Slide Subtitle -->
+    <TextView
+        android:id="@+id/tvSlideSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:lineSpacingExtra="4dp"
+        android:text="Receive hands-free payment voice announcements for Easypaisa, JazzCash, and Raast right on your shop counter."
+        android:textColor="#94A3B8"
+        android:textSize="14sp" />
+
+    <!-- Slide Action Button (e.g. Permission Grant for Slide 3) -->
+    <Button
+        android:id="@+id/btnSlideAction"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="#10B981"
+        android:paddingHorizontal="24dp"
+        android:text="Grant Notification Access"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+</LinearLayout>

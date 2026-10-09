@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0F172A">
+
+    <!-- ViewPager2 Carousel -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPagerOnboarding"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/layoutBottomControls" />
+
+    <!-- Bottom Controls Bar -->
+    <RelativeLayout
+        android:id="@+id/layoutBottomControls"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:paddingHorizontal="24dp">
+
+        <!-- Skip Button -->
+        <Button
+            android:id="@+id/btnSkip"
+            style="?attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:text="Skip"
+            android:textAllCaps="false"
+            android:textColor="#94A3B8"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <!-- Slide Indicator Dots / Page Text -->
+        <TextView
+            android:id="@+id/tvDotsIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="● ○ ○ ○"
+            android:textColor="#10B981"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Next / Continue Pill Button -->
+        <Button
+            android:id="@+id/btnNextContinue"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:backgroundTint="#10B981"
+            android:paddingHorizontal="24dp"
+            android:text="Next"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
