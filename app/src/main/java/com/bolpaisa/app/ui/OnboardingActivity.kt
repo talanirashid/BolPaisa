@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.bolpaisa.app.R
+import com.bolpaisa.app.licensing.MerchantProfileManager
 import com.bolpaisa.app.licensing.SafeEncryptedPreferences
 
 class OnboardingActivity : AppCompatActivity() {
@@ -98,7 +99,13 @@ class OnboardingActivity : AppCompatActivity() {
             e.printStackTrace()
         }
 
-        startActivity(Intent(this, MainActivity::class.java))
+        val profileManager = MerchantProfileManager(this)
+        val intent = if (!profileManager.hasProfile()) {
+            Intent(this, MerchantSetupActivity::class.java)
+        } else {
+            Intent(this, MainActivity::class.java)
+        }
+        startActivity(intent)
         finish()
     }
 }

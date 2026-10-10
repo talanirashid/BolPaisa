@@ -21,17 +21,25 @@ android {
         resourceConfigurations += listOf("en", "ur")
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("${rootDir}/bolpaisa-release.jks")
+            storePassword = "bolpaisa123"
+            keyAlias = "bolpaisa"
+            keyPassword = "bolpaisa123"
+            enableV1Signing = true
+            enableV2Signing = true
+        }
+    }
+
     buildTypes {
         release {
-            // Shrink code and strip unused classes
-            isMinifyEnabled = true
-            // Strip unused XML resources and icons
-            isShrinkResources = true
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug") // Change for production
         }
         debug {
             isMinifyEnabled = false

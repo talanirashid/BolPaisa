@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import com.bolpaisa.app.R
+import com.bolpaisa.app.licensing.MerchantProfileManager
 import com.bolpaisa.app.licensing.SafeEncryptedPreferences
 
 class SplashActivity : AppCompatActivity() {
@@ -14,12 +15,16 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
+        val profileManager = MerchantProfileManager(this)
+
         Handler(Looper.getMainLooper()).postDelayed({
             val isOnboardingCompleted = checkOnboardingCompleted()
-            val intent = if (isOnboardingCompleted) {
-                Intent(this, MainActivity::class.java)
-            } else {
+            val intent = if (!isOnboardingCompleted) {
                 Intent(this, OnboardingActivity::class.java)
+            } else if (!profileManager.hasProfile()) {
+                Intent(this, MerchantSetupActivity::class.java)
+            } else {
+                Intent(this, MainActivity::class.java)
             }
             startActivity(intent)
             finish()

@@ -54,6 +54,7 @@
         <activity android:name=".ui.VoiceSettingsActivity" android:exported="true" />
         <activity android:name=".ui.LanguageSettingsActivity" android:exported="true" />
         <activity android:name=".ui.SafeDemoActivity" android:exported="true" />
+        <activity android:name=".ui.MerchantSetupActivity" android:exported="false" />
         <activity android:name=".ui.AdminPortalActivity" android:exported="false" />
 
         <!-- Ongoing Sticky Service -->
