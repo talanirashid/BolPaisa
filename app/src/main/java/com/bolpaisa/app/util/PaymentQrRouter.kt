@@ -10,6 +10,16 @@ data class PaymentQrResult(
 
 object PaymentQrRouter {
 
+    fun isValidIdentifier(identifier: String): Boolean {
+        val cleanId = identifier.trim()
+        if (cleanId.isEmpty()) return false
+        val isDigits = cleanId.all { it.isDigit() }
+        if (isDigits) {
+            return (cleanId.length in 5..8) || (cleanId.length == 11)
+        }
+        return cleanId.length == 24 && cleanId.startsWith("PK", ignoreCase = true)
+    }
+
     /**
      * Resolves and builds a 100% EMVCo ISO/IEC 18004 & Raast/SBP compliant payment QR payload.
      * Intelligently routes 5-8 digit Till IDs vs 11-digit Mobile Numbers across Easypaisa, JazzCash, and Raast.
@@ -53,7 +63,7 @@ object PaymentQrRouter {
 
         // Build EMVCo tags
         val tag00 = formatTag("00", "01") // Format Indicator
-        val tag01 = if (amount != null && amount > 0.0) formatTag("01", "12") else formatTag("01", "11") // Initiation Method
+        val tag01 = if (amount != null && amount > 0.0) formatTag("01", "12") else formatTag("01", "11") // Initiation Method: 12 (Dynamic), 11 (Static)
         val tagMerchant = formatTag(tagNum, merchantInfoContent) // Tag 26 or 27
         val tag52 = formatTag("52", "5999") // Merchant Category Code
         val tag53 = formatTag("53", "586") // Transaction Currency (PKR = 586)

@@ -1,8 +1,13 @@
 package com.bolpaisa.app.ui
 
+import android.content.ContentValues
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -12,6 +17,7 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
 import com.bolpaisa.app.R
 import com.bolpaisa.app.licensing.MerchantProfileManager
 import com.bolpaisa.app.util.FeedbackHelper
@@ -19,11 +25,14 @@ import com.bolpaisa.app.util.PaymentQrRouter
 import com.bolpaisa.app.util.PaymentRail
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
+import java.io.File
+import java.io.FileOutputStream
 
 class QrGeneratorActivity : BaseActivity() {
 
     private lateinit var profileManager: MerchantProfileManager
     private var selectedRail = PaymentRail.EASYPAISA
+    private var activeGeneratedBitmap: Bitmap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +55,8 @@ class QrGeneratorActivity : BaseActivity() {
         val ivQrImage = findViewById<ImageView>(R.id.ivQrImage)
         val tvQrTillId = findViewById<TextView>(R.id.tvQrTillId)
         val tvQrInstruction = findViewById<TextView>(R.id.tvQrInstruction)
+        val btnShareQr = findViewById<Button>(R.id.btnShareQr)
+        val btnDownloadQr = findViewById<Button>(R.id.btnDownloadQr)
         val btnDone = findViewById<Button>(R.id.btnDoneQr)
 
         btnBack.setOnClickListener { finish() }
@@ -80,16 +91,16 @@ class QrGeneratorActivity : BaseActivity() {
             }
             val amount = amountStr.toDoubleOrNull()
 
-            if (amount == null || amount <= 0) {
-                FeedbackHelper.showError(findViewById(android.R.id.content), "Please enter a valid payment amount")
-                return@setOnClickListener
-            }
-
             val gatewayId = profileManager.getGatewayId(selectedRail.code)
             if (gatewayId.isEmpty()) {
                 promptSetGatewayId(selectedRail.code) {
                     updateGatewayUi(selectedRail, rbEasypaisa, rbJazzCash, rbRaast, tvBanner)
                 }
+                return@setOnClickListener
+            }
+
+            if (!PaymentQrRouter.isValidIdentifier(gatewayId)) {
+                FeedbackHelper.showError(findViewById(android.R.id.content), "Invalid $selectedRail ID length. Must be 5-8 digit Till or 11 digit Mobile.")
                 return@setOnClickListener
             }
 
@@ -105,6 +116,7 @@ class QrGeneratorActivity : BaseActivity() {
 
             val bitmap = generateQrBitmap(qrResult.rawPayload, 600, 600)
             if (bitmap != null) {
+                activeGeneratedBitmap = bitmap
                 ivQrImage.setImageBitmap(bitmap)
 
                 // Set active payment rail logo badge
@@ -117,7 +129,7 @@ class QrGeneratorActivity : BaseActivity() {
 
                 // Render Shop Name on TOP above QR
                 tvQrShopName.text = shopName.uppercase()
-                tvQrAmount.text = "Rs. ${"%.2f".format(amount)}"
+                tvQrAmount.text = if (amount != null && amount > 0.0) "Rs. ${"%.2f".format(amount)}" else "Static Payment QR"
 
                 // Render Till ID / Account Number BELOW QR
                 tvQrTillId.text = qrResult.footerLabel
@@ -130,9 +142,82 @@ class QrGeneratorActivity : BaseActivity() {
             }
         }
 
+        btnShareQr?.setOnClickListener {
+            activeGeneratedBitmap?.let { bmp ->
+                shareQrBitmap(bmp)
+            }
+        }
+
+        btnDownloadQr?.setOnClickListener {
+            activeGeneratedBitmap?.let { bmp ->
+                saveQrToGallery(bmp)
+            }
+        }
+
         btnDone.setOnClickListener {
             layoutResult.visibility = View.GONE
             etAmount.setText("")
+        }
+    }
+
+    private fun shareQrBitmap(bitmap: Bitmap) {
+        try {
+            val cachePath = File(cacheDir, "images")
+            cachePath.mkdirs()
+            val stream = FileOutputStream(File(cachePath, "BolPaisa_QR.png"))
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+            stream.close()
+
+            val imagePath = File(cacheDir, "images")
+            val newFile = File(imagePath, "BolPaisa_QR.png")
+            val contentUri = FileProvider.getUriForFile(this, "$packageName.fileprovider", newFile)
+
+            if (contentUri != null) {
+                val shareIntent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    setDataAndType(contentUri, contentResolver.getType(contentUri))
+                    putExtra(Intent.EXTRA_STREAM, contentUri)
+                    type = "image/png"
+                }
+                startActivity(Intent.createChooser(shareIntent, "Share Payment QR"))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            FeedbackHelper.showError(findViewById(android.R.id.content), "Failed to share QR image")
+        }
+    }
+
+    private fun saveQrToGallery(bitmap: Bitmap) {
+        try {
+            val fileName = "BolPaisa_QR_${System.currentTimeMillis()}.png"
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val values = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                    put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/BolPaisa")
+                }
+                val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+                if (uri != null) {
+                    val out = contentResolver.openOutputStream(uri)
+                    if (out != null) {
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                        out.close()
+                        FeedbackHelper.showSuccess(findViewById(android.R.id.content), "QR saved to Pictures/BolPaisa")
+                    }
+                }
+            } else {
+                val dir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "BolPaisa")
+                if (!dir.exists()) dir.mkdirs()
+                val file = File(dir, fileName)
+                val fos = FileOutputStream(file)
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
+                fos.close()
+                FeedbackHelper.showSuccess(findViewById(android.R.id.content), "QR saved to Pictures/BolPaisa")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            FeedbackHelper.showError(findViewById(android.R.id.content), "Failed to save QR to Gallery")
         }
     }
 
