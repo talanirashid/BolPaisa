@@ -19,7 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bolpaisa.app.R
 import com.bolpaisa.app.licensing.KeyGenerationEngine
 
-class AdminPortalActivity : AppCompatActivity() {
+class AdminPortalActivity : BaseActivity() {
 
     private var generatedKey: String = ""
     private var selectedDays: Int = 30

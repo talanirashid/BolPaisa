@@ -10,7 +10,7 @@ import com.bolpaisa.app.R
 import com.bolpaisa.app.licensing.MerchantProfileManager
 import com.bolpaisa.app.licensing.SafeEncryptedPreferences
 
-class OnboardingActivity : AppCompatActivity() {
+class OnboardingActivity : BaseActivity() {
 
     companion object {
         const val KEY_ONBOARDING_COMPLETED = "key_onboarding_completed"

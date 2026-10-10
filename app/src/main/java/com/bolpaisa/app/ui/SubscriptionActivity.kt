@@ -18,7 +18,7 @@ import com.bolpaisa.app.R
 import com.bolpaisa.app.licensing.SubscriptionManager
 import com.bolpaisa.app.util.FeedbackHelper
 
-class SubscriptionActivity : AppCompatActivity() {
+class SubscriptionActivity : BaseActivity() {
 
     private lateinit var subscriptionManager: SubscriptionManager
     private var selectedPlanName: String? = null

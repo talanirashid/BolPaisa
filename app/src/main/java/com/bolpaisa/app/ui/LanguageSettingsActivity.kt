@@ -1,22 +1,16 @@
 package com.bolpaisa.app.ui
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.RadioButton
 import android.widget.RadioGroup
-import androidx.appcompat.app.AppCompatActivity
 import com.bolpaisa.app.R
 import com.bolpaisa.app.util.FeedbackHelper
 import com.bolpaisa.app.util.LocaleHelper
 
-class LanguageSettingsActivity : AppCompatActivity() {
-
-    override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LocaleHelper.setLocale(newBase, LocaleHelper.getLanguage(newBase)))
-    }
+class LanguageSettingsActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +25,7 @@ class LanguageSettingsActivity : AppCompatActivity() {
 
         btnBack.setOnClickListener { finish() }
 
-        val activeLang = LocaleHelper.getLanguage(this)
+        val activeLang = LocaleHelper.getAppUiLanguage(this)
         when (activeLang) {
             "ur" -> rbUrdu.isChecked = true
             "sd" -> rbSindhi.isChecked = true
@@ -45,7 +39,7 @@ class LanguageSettingsActivity : AppCompatActivity() {
                 else -> "en"
             }
 
-            LocaleHelper.setLocale(this, selectedLangCode)
+            LocaleHelper.setAppUiLanguage(this, selectedLangCode)
             FeedbackHelper.showSuccess(findViewById(android.R.id.content), "App language updated!")
 
             val intent = Intent(this, MainActivity::class.java).apply {

@@ -8,21 +8,31 @@ import java.util.Locale
 object LocaleHelper {
 
     private const val PREFS_NAME = "locale_prefs"
-    private const val SELECTED_LANGUAGE = "selected_language"
+    private const val KEY_APP_UI_LANGUAGE = "key_app_ui_language"
+    private const val KEY_VOICE_ALERT_LANGUAGE = "key_voice_alert_language"
+
+    fun getAppUiLanguage(context: Context): String {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getString(KEY_APP_UI_LANGUAGE, "en") ?: "en"
+    }
+
+    fun setAppUiLanguage(context: Context, languageCode: String) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_APP_UI_LANGUAGE, languageCode).apply()
+    }
+
+    fun getVoiceLanguage(context: Context): String {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getString(KEY_VOICE_ALERT_LANGUAGE, "ur") ?: "ur"
+    }
+
+    fun setVoiceLanguage(context: Context, languageCode: String) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_VOICE_ALERT_LANGUAGE, languageCode).apply()
+    }
 
     fun setLocale(context: Context, language: String): Context {
-        persist(context, language)
         return updateResources(context, language)
-    }
-
-    fun getLanguage(context: Context): String {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        return prefs.getString(SELECTED_LANGUAGE, "en") ?: "en"
-    }
-
-    private fun persist(context: Context, language: String) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putString(SELECTED_LANGUAGE, language).apply()
     }
 
     private fun updateResources(context: Context, language: String): Context {

@@ -5,11 +5,13 @@ import android.content.Intent
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
+import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.os.Build
 import android.os.PowerManager
 import android.speech.tts.TextToSpeech
 import android.util.Log
+import com.bolpaisa.app.R
 import java.util.Locale
 
 class VoiceAlertEngine(private val context: Context) : TextToSpeech.OnInitListener {
@@ -39,9 +41,9 @@ class VoiceAlertEngine(private val context: Context) : TextToSpeech.OnInitListen
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
             tts?.setSpeechRate(0.92f)
-            tts?.setPitch(1.0f)
+            tts?.setPitch(1.02f)
             isTtsReady = true
-            Log.i(tag, "Neural TTS engine initialized successfully.")
+            Log.i(tag, "Neural TTS engine initialized successfully with humanistic pitch and cadence.")
         } else {
             Log.e(tag, "TTS engine initialization failed with status: $status")
         }
@@ -82,43 +84,76 @@ class VoiceAlertEngine(private val context: Context) : TextToSpeech.OnInitListen
         }
     }
 
+    private fun playPreAlertChime() {
+        try {
+            val chimeRes = context.resources.getIdentifier("ding", "raw", context.packageName)
+            if (chimeRes != 0) {
+                val mp = MediaPlayer.create(context, chimeRes)
+                mp?.setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .build()
+                )
+                mp?.setOnCompletionListener { player -> player.release() }
+                mp?.start()
+            } else {
+                val notificationUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+                val ringtone = RingtoneManager.getRingtone(context, notificationUri)
+                ringtone.play()
+            }
+        } catch (e: Exception) {
+            Log.w(tag, "Pre-alert chime playback warning: ${e.message}")
+        }
+    }
+
     fun speakPaymentAlert(walletName: String, amount: Any, langCode: String = "ur") {
         ensureAudibleVolume()
         requestAudioFocus()
         acquireWakeLock()
         onPlaybackStateChangeListener?.invoke(true)
 
-        val amountStr = amount.toString()
-        val targetLocale = when (langCode.lowercase()) {
-            "en" -> Locale("en", "PK")
-            "sd" -> Locale("sd", "PK")
-            else -> Locale("ur", "PK")
-        }
+        playPreAlertChime()
 
-        val formattedSentence = when (langCode.lowercase()) {
-            "en" -> "$walletName: Payment received. $amountStr Rupees."
-            "sd" -> "$walletName تي $amountStr رپيا وصول ٿيا."
-            else -> "$walletName پر $amountStr روپے موصول ہوئے۔"
-        }
+        val amountStr = amount.toString()
+        val lang = langCode.lowercase()
 
         if (isTtsReady && tts != null) {
             try {
-                tts?.language = targetLocale
-                tts?.speak(formattedSentence, TextToSpeech.QUEUE_FLUSH, null, "BolPaisaAlert_${System.currentTimeMillis()}")
+                when (lang) {
+                    "en" -> {
+                        tts?.language = Locale("en", "PK")
+                        val sentence = "$walletName: Payment received. $amountStr Rupees."
+                        tts?.speak(sentence, TextToSpeech.QUEUE_ADD, null, "BolPaisaAlert_EN_${System.currentTimeMillis()}")
+                    }
+                    "sd" -> {
+                        val sdLocale = Locale("sd", "PK")
+                        val avail = tts?.isLanguageAvailable(sdLocale)
+                        if (avail == TextToSpeech.LANG_AVAILABLE || avail == TextToSpeech.LANG_COUNTRY_AVAILABLE) {
+                            tts?.language = sdLocale
+                            val sentence = "$walletName تي $amountStr رپيا وصول ٿيا."
+                            tts?.speak(sentence, TextToSpeech.QUEUE_ADD, null, "BolPaisaAlert_SD_${System.currentTimeMillis()}")
+                        } else {
+                            // Phonetic Sindhi via Urdu Neural Voice Model
+                            tts?.language = Locale("ur", "PK")
+                            val sentence = "$walletName te $amountStr rupiya wasool thya"
+                            tts?.speak(sentence, TextToSpeech.QUEUE_ADD, null, "BolPaisaAlert_SD_Phonetic_${System.currentTimeMillis()}")
+                        }
+                    }
+                    else -> { // "ur"
+                        tts?.language = Locale("ur", "PK")
+                        val sentence = "$walletName پر $amountStr روپے موصول ہوئے۔"
+                        tts?.speak(sentence, TextToSpeech.QUEUE_ADD, null, "BolPaisaAlert_UR_${System.currentTimeMillis()}")
+                    }
+                }
             } catch (e: Exception) {
-                Log.e(tag, "TTS speak failed, falling back to default locale", e)
+                Log.e(tag, "TTS speak failed, falling back to English locale", e)
                 tts?.language = Locale.ENGLISH
-                tts?.speak(formattedSentence, TextToSpeech.QUEUE_FLUSH, null, "BolPaisaAlertFallback")
+                val fallbackSentence = "Payment received. $amountStr Rupees on $walletName."
+                tts?.speak(fallbackSentence, TextToSpeech.QUEUE_ADD, null, "BolPaisaAlert_Fallback")
             }
         } else {
-            Log.w(tag, "TTS engine not ready. Playing notification chime fallback.")
-            try {
-                val notificationUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-                val ringtone = RingtoneManager.getRingtone(context, notificationUri)
-                ringtone.play()
-            } catch (e: Exception) {
-                Log.e(tag, "Ringtone chime fallback failed", e)
-            }
+            Log.w(tag, "TTS engine not ready.")
         }
 
         onPlaybackStateChangeListener?.invoke(false)

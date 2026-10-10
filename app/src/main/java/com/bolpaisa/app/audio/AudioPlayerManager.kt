@@ -62,7 +62,7 @@ class AudioPlayerManager(private val context: Context) : TextToSpeech.OnInitList
     }
 
     fun playSampleAlert(langCode: String) {
-        val activeLang = if (langCode.isNotEmpty()) langCode else LocaleHelper.getLanguage(context)
+        val activeLang = if (langCode.isNotEmpty()) langCode else LocaleHelper.getVoiceLanguage(context)
         voiceAlertEngine.speakPaymentAlert("Easypaisa", 150, activeLang)
     }
 
@@ -116,7 +116,7 @@ class AudioPlayerManager(private val context: Context) : TextToSpeech.OnInitList
         currentPlayer = createConfiguredPlayer(firstResId)
         if (currentPlayer == null) {
             Log.w(tag, "Raw audio res $firstResId missing. Falling back to Neural TTS speech.")
-            voiceAlertEngine.speakPaymentAlert("Easypaisa", 150, LocaleHelper.getLanguage(context))
+            voiceAlertEngine.speakPaymentAlert("Easypaisa", 150, LocaleHelper.getVoiceLanguage(context))
             processNextJob(fallbackText)
             return
         }
@@ -192,7 +192,7 @@ class AudioPlayerManager(private val context: Context) : TextToSpeech.OnInitList
     }
 
     fun playFallbackSpeech(text: String) {
-        voiceAlertEngine.speakPaymentAlert("Easypaisa", text, LocaleHelper.getLanguage(context))
+        voiceAlertEngine.speakPaymentAlert("Easypaisa", text, LocaleHelper.getVoiceLanguage(context))
     }
 
     private fun acquireWakeLock() {

@@ -14,14 +14,13 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Switch
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import com.bolpaisa.app.R
 import com.bolpaisa.app.audio.AudioPlayerManager
 import com.bolpaisa.app.reports.PdfReportGenerator
 import com.bolpaisa.app.util.FeedbackHelper
 import com.bolpaisa.app.util.LocaleHelper
 
-class VoiceSettingsActivity : AppCompatActivity() {
+class VoiceSettingsActivity : BaseActivity() {
 
     private lateinit var audioPlayerManager: AudioPlayerManager
 
@@ -29,10 +28,6 @@ class VoiceSettingsActivity : AppCompatActivity() {
         const val PREFS_NAME = "secure_voice_prefs"
         const val KEY_VOICE_LANGUAGE = "key_voice_language" // "URDU", "ENGLISH", "SINDHI"
         const val KEY_BT_KEEP_ALIVE = "key_bt_keep_alive"
-    }
-
-    override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LocaleHelper.setLocale(newBase, LocaleHelper.getLanguage(newBase)))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,8 +49,8 @@ class VoiceSettingsActivity : AppCompatActivity() {
 
         btnBack.setOnClickListener { finish() }
 
-        val activeLangCode = LocaleHelper.getLanguage(this)
-        when (activeLangCode) {
+        val activeVoiceLang = LocaleHelper.getVoiceLanguage(this)
+        when (activeVoiceLang) {
             "en" -> rbEnglish.isChecked = true
             "sd" -> rbSindhi.isChecked = true
             else -> rbUrdu.isChecked = true
@@ -71,16 +66,10 @@ class VoiceSettingsActivity : AppCompatActivity() {
                 else -> Triple("ur", "URDU", "Urdu")
             }
 
-            if (LocaleHelper.getLanguage(this) != langCode) {
-                LocaleHelper.setLocale(this, langCode)
+            if (LocaleHelper.getVoiceLanguage(this) != langCode) {
+                LocaleHelper.setVoiceLanguage(this, langCode)
                 prefs.edit().putString(KEY_VOICE_LANGUAGE, langName).apply()
-                FeedbackHelper.showSuccess(findViewById(android.R.id.content), "Voice language set to $langLabel")
-
-                val intent = Intent(this, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                }
-                startActivity(intent)
-                finish()
+                FeedbackHelper.showSuccess(findViewById(android.R.id.content), "Voice alert language set to $langLabel")
             }
         }
 
@@ -159,7 +148,7 @@ class VoiceSettingsActivity : AppCompatActivity() {
     }
 
     private fun playSampleAlert() {
-        val activeLang = LocaleHelper.getLanguage(this)
+        val voiceLang = LocaleHelper.getVoiceLanguage(this)
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
         try {
@@ -173,7 +162,7 @@ class VoiceSettingsActivity : AppCompatActivity() {
         }
 
         FeedbackHelper.showInfo(findViewById(android.R.id.content), "Playing sample payment announcement...")
-        audioPlayerManager.playSampleAlert(activeLang)
+        audioPlayerManager.playSampleAlert(voiceLang)
     }
 
     override fun onDestroy() {

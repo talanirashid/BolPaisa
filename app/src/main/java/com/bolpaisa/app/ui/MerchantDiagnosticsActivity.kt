@@ -20,13 +20,9 @@ import com.bolpaisa.app.audio.AudioPlayerManager
 import com.bolpaisa.app.util.FeedbackHelper
 import com.bolpaisa.app.util.LocaleHelper
 
-class MerchantDiagnosticsActivity : AppCompatActivity() {
+class MerchantDiagnosticsActivity : BaseActivity() {
 
     private lateinit var audioPlayerManager: AudioPlayerManager
-
-    override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LocaleHelper.setLocale(newBase, LocaleHelper.getLanguage(newBase)))
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +52,7 @@ class MerchantDiagnosticsActivity : AppCompatActivity() {
         }
 
         btnTestAudio.setOnClickListener {
-            val activeLang = LocaleHelper.getLanguage(this)
+            val activeLang = LocaleHelper.getAppUiLanguage(this)
             FeedbackHelper.showInfo(findViewById(android.R.id.content), "Testing soundbox voice announcement...")
             audioPlayerManager.playSampleAlert(activeLang)
         }

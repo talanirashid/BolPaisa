@@ -17,7 +17,7 @@ import com.bolpaisa.app.licensing.MerchantProfileManager
 import com.bolpaisa.app.util.FeedbackHelper
 import com.bolpaisa.app.util.LocaleHelper
 
-class MerchantSetupActivity : AppCompatActivity() {
+class MerchantSetupActivity : BaseActivity() {
 
     private lateinit var profileManager: MerchantProfileManager
     private lateinit var ivLogoPreview: ImageView
@@ -36,10 +36,6 @@ class MerchantSetupActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
         }
-    }
-
-    override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LocaleHelper.setLocale(newBase, LocaleHelper.getLanguage(newBase)))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

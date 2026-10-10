@@ -15,7 +15,7 @@ import com.bolpaisa.app.R
 import com.bolpaisa.app.licensing.MerchantProfileManager
 import com.bolpaisa.app.licensing.SubscriptionManager
 
-class AboutActivity : AppCompatActivity() {
+class AboutActivity : BaseActivity() {
 
     private var tapCount = 0
     private var lastTapTime = 0L

@@ -1,10 +1,8 @@
 package com.bolpaisa.app.ui
 
-import android.content.Context
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageButton
-import androidx.appcompat.app.AppCompatActivity
 import com.bolpaisa.app.R
 import com.bolpaisa.app.audio.AudioPlayerManager
 import com.bolpaisa.app.audio.VoiceAlertEngine
@@ -12,14 +10,10 @@ import com.bolpaisa.app.reports.PdfReportGenerator
 import com.bolpaisa.app.util.FeedbackHelper
 import com.bolpaisa.app.util.LocaleHelper
 
-class SafeDemoActivity : AppCompatActivity() {
+class SafeDemoActivity : BaseActivity() {
 
     private lateinit var audioPlayerManager: AudioPlayerManager
     private lateinit var voiceAlertEngine: VoiceAlertEngine
-
-    override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LocaleHelper.setLocale(newBase, LocaleHelper.getLanguage(newBase)))
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,15 +30,15 @@ class SafeDemoActivity : AppCompatActivity() {
         btnBack.setOnClickListener { finish() }
 
         btnSimulateEasypaisa.setOnClickListener {
-            val activeLang = LocaleHelper.getLanguage(this)
+            val activeVoiceLang = LocaleHelper.getVoiceLanguage(this)
             FeedbackHelper.showInfo(findViewById(android.R.id.content), "Simulating Easypaisa Rs. 150 voice alert (DEMO)...")
-            voiceAlertEngine.speakPaymentAlert("Easypaisa (DEMO)", 150, activeLang)
+            voiceAlertEngine.speakPaymentAlert("Easypaisa (DEMO)", 150, activeVoiceLang)
         }
 
         btnSimulateJazzCash.setOnClickListener {
-            val activeLang = LocaleHelper.getLanguage(this)
+            val activeVoiceLang = LocaleHelper.getVoiceLanguage(this)
             FeedbackHelper.showInfo(findViewById(android.R.id.content), "Simulating JazzCash Rs. 500 voice alert (DEMO)...")
-            voiceAlertEngine.speakPaymentAlert("JazzCash (DEMO)", 500, activeLang)
+            voiceAlertEngine.speakPaymentAlert("JazzCash (DEMO)", 500, activeVoiceLang)
         }
 
         btnPreviewDemoPdf.setOnClickListener {

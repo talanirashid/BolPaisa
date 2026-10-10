@@ -19,7 +19,7 @@ import com.bolpaisa.app.licensing.MerchantProfileManager
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 
-class QrGeneratorActivity : AppCompatActivity() {
+class QrGeneratorActivity : BaseActivity() {
 
     private lateinit var profileManager: MerchantProfileManager
     private var selectedGateway = "EASYPAISA"

@@ -13,20 +13,15 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import com.bolpaisa.app.R
 import com.bolpaisa.app.audio.AudioPlayerManager
 import com.bolpaisa.app.util.FeedbackHelper
 import com.bolpaisa.app.util.LocaleHelper
 
-class DiagnosticsActivity : AppCompatActivity() {
+class DiagnosticsActivity : BaseActivity() {
 
     private lateinit var audioPlayerManager: AudioPlayerManager
-
-    override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LocaleHelper.setLocale(newBase, LocaleHelper.getLanguage(newBase)))
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +51,7 @@ class DiagnosticsActivity : AppCompatActivity() {
         }
 
         btnTestAudio.setOnClickListener {
-            val activeLang = LocaleHelper.getLanguage(this)
+            val activeLang = LocaleHelper.getVoiceLanguage(this)
             FeedbackHelper.showInfo(findViewById(android.R.id.content), "Testing soundbox voice announcement...")
             audioPlayerManager.playSampleAlert(activeLang)
         }
@@ -102,7 +97,7 @@ class DiagnosticsActivity : AppCompatActivity() {
         }
 
         // Check 2: Payment Monitoring Readiness
-        tvMonitoringStatus.text = "Monitoring Active • Ready for incoming notifications"
+        tvMonitoringStatus.text = "Monitoring Active • Ready for incoming broadcasts"
 
         // Check 3: Bluetooth Speaker Connection
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager

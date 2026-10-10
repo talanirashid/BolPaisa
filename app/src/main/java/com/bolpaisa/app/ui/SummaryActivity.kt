@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 
-class SummaryActivity : AppCompatActivity() {
+class SummaryActivity : BaseActivity() {
 
     private lateinit var database: AppDatabase
     private lateinit var adapter: TransactionAdapter

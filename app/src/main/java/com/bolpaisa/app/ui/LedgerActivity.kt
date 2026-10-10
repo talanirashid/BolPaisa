@@ -28,7 +28,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-class LedgerActivity : AppCompatActivity() {
+class LedgerActivity : BaseActivity() {
 
     private lateinit var database: AppDatabase
     private lateinit var adapter: TransactionAdapter
@@ -37,10 +37,6 @@ class LedgerActivity : AppCompatActivity() {
     private var allTransactions: List<TransactionEntity> = emptyList()
     private var currentFilterMode = "ALL" // ALL, TODAY, YESTERDAY
     private var currentSearchQuery = ""
-
-    override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LocaleHelper.setLocale(newBase, LocaleHelper.getLanguage(newBase)))
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
