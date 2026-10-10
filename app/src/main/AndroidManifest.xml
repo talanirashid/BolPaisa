@@ -44,7 +44,7 @@
             android:exported="true"
             android:launchMode="singleTop" />
 
-        <activity android:name=".ui.LedgerActivity" />
+        <activity android:name=".ui.LedgerActivity" android:exported="true" />
         <activity android:name=".ui.SetupActivity" android:exported="true" />
         <activity android:name=".ui.AboutActivity" android:exported="true" />
         <activity android:name=".ui.OnboardingActivity" android:exported="true" />
