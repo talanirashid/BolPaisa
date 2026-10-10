@@ -124,7 +124,7 @@ class LedgerActivity : AppCompatActivity() {
         }
 
         val totalSum = searchFiltered.sumOf { it.amount }
-        tvSummary.text = "${searchFiltered.size} Payments • Total: Rs. ${"%.2f".format(totalSum)}"
+        tvSummary.text = "${searchFiltered.size} Payments • Total: Rs. ${"%.2f".format(totalSum.toDouble())}"
         adapter.updateTransactions(searchFiltered)
     }
 
