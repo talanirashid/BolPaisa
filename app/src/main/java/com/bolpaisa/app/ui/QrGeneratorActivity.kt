@@ -15,8 +15,8 @@ import androidx.appcompat.app.AlertDialog
 import com.bolpaisa.app.R
 import com.bolpaisa.app.licensing.MerchantProfileManager
 import com.bolpaisa.app.util.FeedbackHelper
+import com.bolpaisa.app.util.PaymentQrRouter
 import com.bolpaisa.app.util.PaymentRail
-import com.bolpaisa.app.util.PaymentRailQrFactory
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 
@@ -40,6 +40,7 @@ class QrGeneratorActivity : BaseActivity() {
         val etAmount = findViewById<EditText>(R.id.etAmountInput)
         val btnGenerate = findViewById<Button>(R.id.btnGenerateQr)
         val layoutResult = findViewById<View>(R.id.layoutQrResult)
+        val ivQrRailLogo = findViewById<ImageView>(R.id.ivQrRailLogo)
         val tvQrShopName = findViewById<TextView>(R.id.tvQrShopName)
         val tvQrAmount = findViewById<TextView>(R.id.tvQrAmount)
         val ivQrImage = findViewById<ImageView>(R.id.ivQrImage)
@@ -94,24 +95,32 @@ class QrGeneratorActivity : BaseActivity() {
 
             val shopName = profileManager.getShopName()
 
-            // Generate multi-rail EMVCo ISO/IEC 18004 & Raast/SBP compliant QR code payload string
-            val emvQrPayload = PaymentRailQrFactory.createEmvcoQrPayload(
+            // Resolve multi-rail EMVCo ISO/IEC 18004 & Raast/SBP compliant QR code payload
+            val qrResult = PaymentQrRouter.resolvePaymentPayload(
                 rail = selectedRail,
-                merchantTillOrAccount = gatewayId,
-                merchantName = shopName,
+                identifier = gatewayId,
+                recipientName = shopName,
                 amount = amount
             )
 
-            val bitmap = generateQrBitmap(emvQrPayload, 600, 600)
+            val bitmap = generateQrBitmap(qrResult.rawPayload, 600, 600)
             if (bitmap != null) {
                 ivQrImage.setImageBitmap(bitmap)
+
+                // Set active payment rail logo badge
+                val logoRes = when (selectedRail) {
+                    PaymentRail.JAZZCASH -> R.drawable.ic_logo_jazzcash
+                    PaymentRail.RAAST -> R.drawable.ic_logo_raast
+                    else -> R.drawable.ic_logo_easypaisa
+                }
+                ivQrRailLogo?.setImageResource(logoRes)
 
                 // Render Shop Name on TOP above QR
                 tvQrShopName.text = shopName.uppercase()
                 tvQrAmount.text = "Rs. ${"%.2f".format(amount)}"
 
                 // Render Till ID / Account Number BELOW QR
-                tvQrTillId.text = "Till ID / Account: $gatewayId (${selectedRail.displayName})"
+                tvQrTillId.text = qrResult.footerLabel
                 tvQrInstruction.text = "Scan with ${selectedRail.displayName}, Raast, or Banking App"
 
                 layoutResult.visibility = View.VISIBLE
