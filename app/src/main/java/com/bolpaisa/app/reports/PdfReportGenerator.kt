@@ -118,6 +118,95 @@ object PdfReportGenerator {
         savePdfFile(context, pdfDocument, fileName)
     }
 
+    fun generateDemoReport(context: Context) {
+        val demoTransactions = listOf(
+            TransactionEntity(id = 101L, provider = "Easypaisa (DEMO)", amount = 150L, senderName = "Sample Customer 1", timestamp = System.currentTimeMillis() - 3600000L),
+            TransactionEntity(id = 102L, provider = "JazzCash (DEMO)", amount = 350L, senderName = "Sample Customer 2", timestamp = System.currentTimeMillis() - 1800000L),
+            TransactionEntity(id = 103L, provider = "Raast (DEMO)", amount = 500L, senderName = "Sample Customer 3", timestamp = System.currentTimeMillis())
+        )
+
+        val pdfDocument = PdfDocument()
+        val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
+        val page = pdfDocument.startPage(pageInfo)
+        val canvas = page.canvas
+
+        val paint = Paint()
+        val titlePaint = Paint().apply {
+            color = Color.BLACK
+            textSize = 18f
+            isFakeBoldText = true
+        }
+
+        val demoWatermarkPaint = Paint().apply {
+            color = Color.RED
+            textSize = 20f
+            isFakeBoldText = true
+            alpha = 180
+        }
+
+        val subTitlePaint = Paint().apply {
+            color = Color.DKGRAY
+            textSize = 11f
+        }
+
+        val textPaint = Paint().apply {
+            color = Color.BLACK
+            textSize = 11f
+        }
+
+        val boldPaint = Paint().apply {
+            color = Color.BLACK
+            textSize = 11f
+            isFakeBoldText = true
+        }
+
+        val dateFormat = SimpleDateFormat("dd-MMM-yyyy HH:mm", Locale.getDefault())
+        val todayStr = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault()).format(Date())
+
+        canvas.drawText("DEMO REPORT - NOT A REAL PAYMENT", 40f, 30f, demoWatermarkPaint)
+        canvas.drawText("BolPaisa Safe Demo - Sample Ledger", 40f, 60f, titlePaint)
+        canvas.drawText("For demonstration purposes only | Date: $todayStr", 40f, 80f, subTitlePaint)
+
+        paint.color = Color.RED
+        paint.strokeWidth = 2f
+        canvas.drawLine(40f, 95f, 555f, 95f, paint)
+
+        var y = 120f
+        canvas.drawText("Time", 40f, y, boldPaint)
+        canvas.drawText("Gateway / Provider", 180f, y, boldPaint)
+        canvas.drawText("Sender Name", 340f, y, boldPaint)
+        canvas.drawText("Amount (Rs.)", 460f, y, boldPaint)
+
+        y += 10f
+        canvas.drawLine(40f, y, 555f, y, paint)
+
+        y += 20f
+        for (trx in demoTransactions) {
+            val timeStr = dateFormat.format(Date(trx.timestamp))
+            val sender = trx.senderName ?: "-"
+
+            canvas.drawText(timeStr, 40f, y, textPaint)
+            canvas.drawText(trx.provider, 180f, y, textPaint)
+            canvas.drawText(sender, 340f, y, textPaint)
+            canvas.drawText("Rs. ${trx.amount}", 460f, y, textPaint)
+
+            y += 20f
+        }
+
+        y += 10f
+        canvas.drawLine(40f, y, 555f, y, paint)
+        y += 25f
+        canvas.drawText("Total Transactions: 3 (DEMO)", 40f, y, boldPaint)
+        canvas.drawText("Total Wasool Shuda: Rs. 1000 (DEMO)", 340f, y, boldPaint)
+
+        canvas.drawText("DEMO - NOT A REAL PAYMENT", 120f, 500f, demoWatermarkPaint)
+
+        pdfDocument.finishPage(page)
+
+        val fileName = "BolPaisa_DEMO_Report_$todayStr.pdf"
+        savePdfFile(context, pdfDocument, fileName)
+    }
+
     private fun savePdfFile(context: Context, pdfDocument: PdfDocument, fileName: String) {
         try {
             val successMessage = "PDF Report saved to Documents/BolPaisa"

@@ -79,6 +79,45 @@
 
         </LinearLayout>
 
+        <!-- Diagnostic Report Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="#1B2940"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Diagnostic Support Report"
+                android:textColor="#F8FAFC"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Generates a privacy-filtered system report (version, SDK, permissions, DB size) to share with support."
+                android:textColor="#94A3B8"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/btnShareDiagnostic"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#38BDF8"
+                android:text="Share Diagnostic Report"
+                android:textAllCaps="false"
+                android:textColor="#0F172A"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
         <!-- Official Support Card -->
         <LinearLayout
             android:layout_width="match_parent"

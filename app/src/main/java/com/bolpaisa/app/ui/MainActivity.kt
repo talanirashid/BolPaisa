@@ -221,6 +221,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateStatusDisplay(tvStatusPill: TextView) {
         val tvSubscriptionDays = findViewById<TextView>(R.id.tvSubscriptionDays)
+        val layoutExpiryWarning = findViewById<View>(R.id.layoutExpiryWarning)
+        val tvExpiryWarningText = findViewById<TextView>(R.id.tvExpiryWarningText)
+
         val isActive = subscriptionManager.isSubscriptionActive()
         val remainingDays = subscriptionManager.getRemainingDays()
 
@@ -230,10 +233,26 @@ class MainActivity : AppCompatActivity() {
             tvStatusPill.text = "✓ Active"
             tvStatusPill.setBackgroundColor(android.graphics.Color.parseColor("#064E3B"))
             tvStatusPill.setTextColor(android.graphics.Color.parseColor("#19C878"))
+
+            if (remainingDays <= 5) {
+                layoutExpiryWarning?.visibility = View.VISIBLE
+                tvExpiryWarningText?.text = "⚠️ Subscription expiring in $remainingDays day${if (remainingDays != 1L) "s" else ""}! Tap to renew."
+                layoutExpiryWarning?.setOnClickListener {
+                    startActivity(Intent(this, SubscriptionActivity::class.java))
+                }
+            } else {
+                layoutExpiryWarning?.visibility = View.GONE
+            }
         } else {
             tvStatusPill.text = "● Expired"
             tvStatusPill.setBackgroundColor(android.graphics.Color.parseColor("#7F1D1D"))
             tvStatusPill.setTextColor(android.graphics.Color.parseColor("#EF4444"))
+
+            layoutExpiryWarning?.visibility = View.VISIBLE
+            tvExpiryWarningText?.text = "❌ Subscription Expired! Tap to renew now."
+            layoutExpiryWarning?.setOnClickListener {
+                startActivity(Intent(this, SubscriptionActivity::class.java))
+            }
         }
     }
 

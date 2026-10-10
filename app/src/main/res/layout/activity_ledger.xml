@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0F172A"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Top App Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back"
+            android:src="@android:drawable/ic_menu_revert"
+            android:tint="#FFFFFF" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="Payment History &amp; Search"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- Search Input Field -->
+    <EditText
+        android:id="@+id/etSearchQuery"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:background="#1E293B"
+        android:hint="Search by amount (e.g. 350) or sender name"
+        android:inputType="text"
+        android:paddingHorizontal="16dp"
+        android:textColor="#F8FAFC"
+        android:textColorHint="#64748B"
+        android:textSize="14sp" />
+
+    <!-- Period Filter RadioGroup -->
+    <RadioGroup
+        android:id="@+id/rgLedgerFilter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rbAll"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#1E293B"
+            android:button="@null"
+            android:checked="true"
+            android:gravity="center"
+            android:paddingVertical="10dp"
+            android:text="All"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <RadioButton
+            android:id="@+id/rbToday"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:background="#1E293B"
+            android:button="@null"
+            android:gravity="center"
+            android:paddingVertical="10dp"
+            android:text="Today"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <RadioButton
+            android:id="@+id/rbYesterday"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:background="#1E293B"
+            android:button="@null"
+            android:gravity="center"
+            android:paddingVertical="10dp"
+            android:text="Yesterday"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+    </RadioGroup>
+
+    <!-- Filtered Summary Banner -->
+    <TextView
+        android:id="@+id/tvFilteredSummary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="#1E293B"
+        android:padding="12dp"
+        android:text="0 Payments • Total: Rs. 0.00"
+        android:textColor="#10B981"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <!-- History RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvLedgerHistory"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="1" />
+
+</LinearLayout>

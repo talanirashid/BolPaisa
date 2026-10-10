@@ -17,6 +17,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bolpaisa.app.R
 import com.bolpaisa.app.audio.AudioPlayerManager
+import com.bolpaisa.app.reports.PdfReportGenerator
 import com.bolpaisa.app.util.FeedbackHelper
 import com.bolpaisa.app.util.LocaleHelper
 
@@ -46,6 +47,8 @@ class VoiceSettingsActivity : AppCompatActivity() {
         val rbEnglish = findViewById<RadioButton>(R.id.rbEnglish)
         val rbSindhi = findViewById<RadioButton>(R.id.rbSindhi)
         val btnTestAlert = findViewById<Button>(R.id.btnTestAlert)
+        val btnPlayDemoAudio = findViewById<Button>(R.id.btnPlayDemoAudio)
+        val btnPreviewDemoPdf = findViewById<Button>(R.id.btnPreviewDemoPdf)
         val switchBtKeepAlive = findViewById<Switch>(R.id.switchBtKeepAlive)
         val btnPairBluetooth = findViewById<Button>(R.id.btnPairBluetooth)
 
@@ -101,6 +104,14 @@ class VoiceSettingsActivity : AppCompatActivity() {
 
         btnTestAlert.setOnClickListener {
             playSampleAlert()
+        }
+
+        btnPlayDemoAudio?.setOnClickListener {
+            playSampleAlert()
+        }
+
+        btnPreviewDemoPdf?.setOnClickListener {
+            PdfReportGenerator.generateDemoReport(this)
         }
 
         btnPairBluetooth.setOnClickListener {

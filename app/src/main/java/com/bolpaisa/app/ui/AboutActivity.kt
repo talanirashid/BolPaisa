@@ -12,6 +12,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.bolpaisa.app.R
+import com.bolpaisa.app.licensing.MerchantProfileManager
+import com.bolpaisa.app.licensing.SubscriptionManager
 
 class AboutActivity : AppCompatActivity() {
 
@@ -28,6 +30,7 @@ class AboutActivity : AppCompatActivity() {
 
         val ivLogo = findViewById<ImageView>(R.id.ivAboutLogo)
         val tvVersion = findViewById<TextView>(R.id.tvVersion)
+        val btnShareDiagnostic = findViewById<Button>(R.id.btnShareDiagnostic)
         val btnWhatsApp = findViewById<Button>(R.id.btnWhatsApp)
         val btnEmail = findViewById<Button>(R.id.btnEmail)
 
@@ -53,6 +56,10 @@ class AboutActivity : AppCompatActivity() {
             }
         }
 
+        btnShareDiagnostic?.setOnClickListener {
+            shareDiagnosticReport()
+        }
+
         btnWhatsApp.setOnClickListener {
             val url = "https://wa.me/923336366291?text=Assalam-o-Alaikum%20Mehrzaad%20Technologies,%20I%20need%20help%20with%20BolPaisa"
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
@@ -75,6 +82,48 @@ class AboutActivity : AppCompatActivity() {
             } catch (e: ActivityNotFoundException) {
                 Toast.makeText(this, "No email client found on this device.", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun shareDiagnosticReport() {
+        val subscriptionManager = SubscriptionManager(this)
+        val profileManager = MerchantProfileManager(this)
+
+        var versionStr = "1.0.1"
+        try {
+            val pInfo = packageManager.getPackageInfo(packageName, 0)
+            versionStr = pInfo.versionName ?: "1.0.1"
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        val dbFile = getDatabasePath("bolpaisa_database")
+        val dbSizeKb = if (dbFile.exists()) dbFile.length() / 1024 else 0
+
+        val reportText = """
+            *BolPaisa Diagnostic Support Report*
+            App Version: $versionStr
+            Android SDK: ${android.os.Build.VERSION.SDK_INT} (${android.os.Build.VERSION.RELEASE})
+            Device Model: ${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}
+            Shop Name: ${profileManager.getShopName()}
+            Gateway: ${profileManager.getGatewayType()}
+            Device ID: ${subscriptionManager.getDeviceId()}
+            Subscription Active: ${subscriptionManager.isSubscriptionActive()} (${subscriptionManager.getRemainingDays()} days left)
+            Database Size: ${dbSizeKb} KB
+            (Privacy Note: Secrets, keys, and private customer payments excluded)
+        """.trimIndent()
+
+        val url = "https://wa.me/923336366291?text=${Uri.encode(reportText)}"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        try {
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            val sendIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, reportText)
+                type = "text/plain"
+            }
+            startActivity(Intent.createChooser(sendIntent, "Share Diagnostic Report"))
         }
     }
 
