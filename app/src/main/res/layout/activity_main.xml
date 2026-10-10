@@ -35,7 +35,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="BolPaisa"
+                    android:text="@string/app_name"
                     android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -44,7 +44,7 @@
                     android:id="@+id/tvDashboardSubtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Digital Soundbox"
+                    android:text="@string/app_subtitle"
                     android:textColor="#A7B7CD"
                     android:textSize="12sp" />
 
@@ -58,7 +58,7 @@
                 android:background="#064E3B"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="6dp"
-                android:text="✓ Active"
+                android:text="@string/status_active"
                 android:textColor="#19C878"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -122,7 +122,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Today's Collections"
+                android:text="@string/todays_collections"
                 android:textColor="#A7B7CD"
                 android:textSize="13sp" />
 
@@ -141,7 +141,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="🕒 No payments received yet today"
+                android:text="@string/no_payments_today"
                 android:textColor="#A7B7CD"
                 android:textSize="13sp" />
 
@@ -167,7 +167,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Transactions"
+                        android:text="@string/transactions"
                         android:textColor="#A7B7CD"
                         android:textSize="12sp" />
 
@@ -192,7 +192,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Last payment"
+                        android:text="@string/last_payment"
                         android:textColor="#A7B7CD"
                         android:textSize="12sp" />
 
@@ -218,7 +218,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginTop="20dp"
-            android:text="Collect Payment"
+            android:text="@string/collect_payment"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -230,7 +230,7 @@
             android:layout_height="54dp"
             android:layout_marginTop="10dp"
             android:backgroundTint="#19C878"
-            android:text="Receive Payment"
+            android:text="@string/receive_payment"
             android:textAllCaps="false"
             android:textColor="#0B1220"
             android:textSize="15sp"
@@ -250,7 +250,7 @@
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
                 android:backgroundTint="#202E44"
-                android:text="Replay Audio"
+                android:text="@string/replay_audio"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
                 android:textSize="13sp"
@@ -263,7 +263,7 @@
                 android:layout_marginStart="6dp"
                 android:layout_weight="1"
                 android:backgroundTint="#202E44"
-                android:text="Send Receipt"
+                android:text="@string/send_receipt"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
                 android:textSize="13sp"
@@ -277,7 +277,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginTop="20dp"
-            android:text="Merchant Tools"
+            android:text="@string/merchant_tools"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -312,7 +312,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Summary"
+                    android:text="@string/summary"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -321,7 +321,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Collections &amp; PDF"
+                    android:text="@string/summary_subtitle"
                     android:textColor="#A7B7CD"
                     android:textSize="12sp" />
 
@@ -350,7 +350,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Payment History"
+                    android:text="@string/payment_history"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -359,7 +359,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="All transactions &amp; Search"
+                    android:text="@string/payment_history_subtitle"
                     android:textColor="#A7B7CD"
                     android:textSize="12sp" />
 
@@ -397,7 +397,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Customer QR"
+                    android:text="@string/customer_qr"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -406,7 +406,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Counter Payment QR"
+                    android:text="@string/customer_qr_subtitle"
                     android:textColor="#A7B7CD"
                     android:textSize="12sp" />
 
@@ -435,7 +435,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Voice &amp; Audio"
+                    android:text="@string/voice_and_audio"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -444,7 +444,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Speaker &amp; Volume Boost"
+                    android:text="@string/voice_and_audio_subtitle"
                     android:textColor="#A7B7CD"
                     android:textSize="12sp" />
 
@@ -483,7 +483,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="App Language"
+                    android:text="@string/app_language"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -492,7 +492,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="ایپ کی زبان / ٻولي"
+                    android:text="@string/app_language_subtitle"
                     android:textColor="#A7B7CD"
                     android:textSize="12sp" />
 
@@ -522,7 +522,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Safe Demo Mode"
+                    android:text="@string/safe_demo_mode"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -531,7 +531,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Shop Sound &amp; Ledger Demo"
+                    android:text="@string/safe_demo_subtitle"
                     android:textColor="#A7B7CD"
                     android:textSize="12sp" />
 
@@ -570,7 +570,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Diagnostic &amp; Support"
+                    android:text="@string/diagnostic_support"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -579,7 +579,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="WhatsApp Report"
+                    android:text="@string/diagnostic_subtitle"
                     android:textColor="#A7B7CD"
                     android:textSize="12sp" />
 
@@ -609,7 +609,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Shop Profile"
+                    android:text="@string/shop_profile"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -618,7 +618,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Shop Name &amp; Preferences"
+                    android:text="@string/shop_profile_subtitle"
                     android:textColor="#A7B7CD"
                     android:textSize="12sp" />
 
@@ -658,7 +658,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Subscription"
+                    android:text="@string/subscription"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -690,7 +690,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginTop="20dp"
-            android:text="Today's Payment History"
+            android:text="@string/todays_payment_history"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -702,7 +702,7 @@
             android:layout_marginTop="8dp"
             android:background="#182436"
             android:padding="16dp"
-            android:text="No payments announced yet today."
+            android:text="@string/no_payments_announced"
             android:textColor="#A7B7CD"
             android:textSize="13sp"
             android:visibility="gone" />

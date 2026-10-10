@@ -3,6 +3,8 @@ package com.bolpaisa.app.util
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import java.util.Locale
 
 object LocaleHelper {
@@ -19,6 +21,13 @@ object LocaleHelper {
     fun setAppUiLanguage(context: Context, languageCode: String) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putString(KEY_APP_UI_LANGUAGE, languageCode).apply()
+
+        try {
+            val appLocales = LocaleListCompat.forLanguageTags(languageCode)
+            AppCompatDelegate.setApplicationLocales(appLocales)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun getVoiceLanguage(context: Context): String {
@@ -52,6 +61,9 @@ object LocaleHelper {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             config.setLayoutDirection(locale)
         }
+
+        @Suppress("DEPRECATION")
+        resources.updateConfiguration(config, resources.displayMetrics)
 
         return context.createConfigurationContext(config)
     }
