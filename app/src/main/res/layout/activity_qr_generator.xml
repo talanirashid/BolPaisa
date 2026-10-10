@@ -159,35 +159,74 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
+            android:background="#1E293B"
             android:gravity="center_horizontal"
             android:orientation="vertical"
+            android:padding="20dp"
             android:visibility="gone">
 
+            <!-- 1. Shop Name & Amount on TOP above QR -->
+            <TextView
+                android:id="@+id/tvQrShopName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="MADINA GENERAL STORE"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvQrAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:background="#064E3B"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="6dp"
+                android:text="Rs. 150.00"
+                android:textColor="#10B981"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <!-- 2. Center High-Contrast QR Code -->
             <ImageView
                 android:id="@+id/ivQrImage"
                 android:layout_width="260dp"
                 android:layout_height="260dp"
+                android:layout_marginTop="16dp"
                 android:background="@android:color/white"
                 android:contentDescription="Customer Payment QR"
                 android:padding="12dp" />
 
+            <!-- 3. Till ID & Instruction BELOW QR -->
             <TextView
-                android:id="@+id/tvQrHeadline"
+                android:id="@+id/tvQrTillId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
                 android:gravity="center"
-                android:text="Scan to Pay Rs. 350\nBolPaisa Merchant"
+                android:text="Till ID / Account: 03336366291 (Easypaisa)"
                 android:textColor="#38BDF8"
                 android:textSize="15sp"
                 android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvQrInstruction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="Scan with Easypaisa, JazzCash, or Raast App"
+                android:textColor="#94A3B8"
+                android:textSize="13sp" />
 
             <Button
                 android:id="@+id/btnDoneQr"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginTop="16dp"
-                android:backgroundTint="#202E44"
+                android:layout_marginTop="20dp"
+                android:backgroundTint="#24344B"
                 android:text="Done / New Payment"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"

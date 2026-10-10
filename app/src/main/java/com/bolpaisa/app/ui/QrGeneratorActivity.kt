@@ -11,11 +11,11 @@ import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import com.bolpaisa.app.R
 import com.bolpaisa.app.licensing.MerchantProfileManager
+import com.bolpaisa.app.util.EmvQrGenerator
+import com.bolpaisa.app.util.FeedbackHelper
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 
@@ -39,8 +39,11 @@ class QrGeneratorActivity : BaseActivity() {
         val etAmount = findViewById<EditText>(R.id.etAmountInput)
         val btnGenerate = findViewById<Button>(R.id.btnGenerateQr)
         val layoutResult = findViewById<View>(R.id.layoutQrResult)
+        val tvQrShopName = findViewById<TextView>(R.id.tvQrShopName)
+        val tvQrAmount = findViewById<TextView>(R.id.tvQrAmount)
         val ivQrImage = findViewById<ImageView>(R.id.ivQrImage)
-        val tvHeadline = findViewById<TextView>(R.id.tvQrHeadline)
+        val tvQrTillId = findViewById<TextView>(R.id.tvQrTillId)
+        val tvQrInstruction = findViewById<TextView>(R.id.tvQrInstruction)
         val btnDone = findViewById<Button>(R.id.btnDoneQr)
 
         btnBack.setOnClickListener { finish() }
@@ -76,7 +79,7 @@ class QrGeneratorActivity : BaseActivity() {
             val amount = amountStr.toDoubleOrNull()
 
             if (amount == null || amount <= 0) {
-                Toast.makeText(this, "Please enter a valid payment amount", Toast.LENGTH_SHORT).show()
+                FeedbackHelper.showError(findViewById(android.R.id.content), "Please enter a valid payment amount")
                 return@setOnClickListener
             }
 
@@ -89,29 +92,31 @@ class QrGeneratorActivity : BaseActivity() {
             }
 
             val shopName = profileManager.getShopName()
-            val isTillId = gatewayId.length <= 8 && gatewayId.all { it.isDigit() }
 
-            val qrPayload = when (selectedGateway.uppercase()) {
-                "RAAST" -> "raast://pay?receiver=$gatewayId&amount=$amountStr&ref=BolPaisa"
-                "JAZZCASH" -> if (isTillId) {
-                    "jazzcash://merchant?merchant_id=$gatewayId&amount=$amountStr"
-                } else {
-                    "jazzcash://pay?receiver=$gatewayId&amount=$amountStr"
-                }
-                else -> if (isTillId) { // EASYPAISA
-                    "easypaisa://till?till_id=$gatewayId&amount=$amountStr"
-                } else {
-                    "easypaisa://pay?receiver=$gatewayId&amount=$amountStr"
-                }
-            }
+            // Generate 100% EMVCo ISO/IEC 18004 & Raast compliant QR code payload string
+            val emvQrPayload = EmvQrGenerator.generateMerchantQrPayload(
+                gatewayType = selectedGateway,
+                merchantIdOrTill = gatewayId,
+                merchantName = shopName,
+                amount = amount
+            )
 
-            val bitmap = generateQrBitmap(qrPayload, 600, 600)
+            val bitmap = generateQrBitmap(emvQrPayload, 600, 600)
             if (bitmap != null) {
                 ivQrImage.setImageBitmap(bitmap)
-                tvHeadline.text = "Scan with $selectedGateway App\n$shopName ($gatewayId) • Rs. $amountStr"
+
+                // Render Shop Name on TOP above QR
+                tvQrShopName.text = shopName.uppercase()
+                tvQrAmount.text = "Rs. ${"%.2f".format(amount)}"
+
+                // Render Till ID / Account Number BELOW QR
+                tvQrTillId.text = "Till ID / Account: $gatewayId ($selectedGateway)"
+                tvQrInstruction.text = "Scan with $selectedGateway, JazzCash, or Raast App"
+
                 layoutResult.visibility = View.VISIBLE
+                FeedbackHelper.showSuccess(findViewById(android.R.id.content), "Customer Payment QR generated!")
             } else {
-                Toast.makeText(this, "Failed to generate QR code", Toast.LENGTH_SHORT).show()
+                FeedbackHelper.showError(findViewById(android.R.id.content), "Failed to generate QR code")
             }
         }
 
@@ -160,10 +165,10 @@ class QrGeneratorActivity : BaseActivity() {
             val enteredId = input.text.toString().trim()
             if (enteredId.isNotEmpty()) {
                 profileManager.saveGatewayId(gateway, enteredId)
-                Toast.makeText(this, "$gateway ID saved!", Toast.LENGTH_SHORT).show()
+                FeedbackHelper.showSuccess(findViewById(android.R.id.content), "$gateway ID saved!")
                 onSaved()
             } else {
-                Toast.makeText(this, "ID cannot be empty", Toast.LENGTH_SHORT).show()
+                FeedbackHelper.showError(findViewById(android.R.id.content), "ID cannot be empty")
             }
         }
         builder.setNegativeButton("Cancel", null)
