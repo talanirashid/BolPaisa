@@ -14,15 +14,16 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.bolpaisa.app.R
 import com.bolpaisa.app.licensing.MerchantProfileManager
-import com.bolpaisa.app.util.EmvQrGenerator
 import com.bolpaisa.app.util.FeedbackHelper
+import com.bolpaisa.app.util.PaymentRail
+import com.bolpaisa.app.util.PaymentRailQrFactory
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 
 class QrGeneratorActivity : BaseActivity() {
 
     private lateinit var profileManager: MerchantProfileManager
-    private var selectedGateway = "EASYPAISA"
+    private var selectedRail = PaymentRail.EASYPAISA
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,26 +49,26 @@ class QrGeneratorActivity : BaseActivity() {
 
         btnBack.setOnClickListener { finish() }
 
-        selectedGateway = profileManager.getGatewayType()
-        when (selectedGateway.uppercase()) {
-            "JAZZCASH" -> rbJazzCash.isChecked = true
-            "RAAST" -> rbRaast.isChecked = true
+        selectedRail = PaymentRail.fromCode(profileManager.getGatewayType())
+        when (selectedRail) {
+            PaymentRail.JAZZCASH -> rbJazzCash.isChecked = true
+            PaymentRail.RAAST -> rbRaast.isChecked = true
             else -> rbEasypaisa.isChecked = true
         }
-        updateGatewayUi(selectedGateway, rbEasypaisa, rbJazzCash, rbRaast, tvBanner)
+        updateGatewayUi(selectedRail, rbEasypaisa, rbJazzCash, rbRaast, tvBanner)
 
         rgGateway.setOnCheckedChangeListener { _, checkedId ->
-            selectedGateway = when (checkedId) {
-                R.id.rbJazzCash -> "JAZZCASH"
-                R.id.rbRaast -> "RAAST"
-                else -> "EASYPAISA"
+            selectedRail = when (checkedId) {
+                R.id.rbJazzCash -> PaymentRail.JAZZCASH
+                R.id.rbRaast -> PaymentRail.RAAST
+                else -> PaymentRail.EASYPAISA
             }
-            updateGatewayUi(selectedGateway, rbEasypaisa, rbJazzCash, rbRaast, tvBanner)
+            updateGatewayUi(selectedRail, rbEasypaisa, rbJazzCash, rbRaast, tvBanner)
         }
 
         tvBanner.setOnClickListener {
-            promptSetGatewayId(selectedGateway) {
-                updateGatewayUi(selectedGateway, rbEasypaisa, rbJazzCash, rbRaast, tvBanner)
+            promptSetGatewayId(selectedRail.code) {
+                updateGatewayUi(selectedRail, rbEasypaisa, rbJazzCash, rbRaast, tvBanner)
             }
         }
 
@@ -83,20 +84,20 @@ class QrGeneratorActivity : BaseActivity() {
                 return@setOnClickListener
             }
 
-            val gatewayId = profileManager.getGatewayId(selectedGateway)
+            val gatewayId = profileManager.getGatewayId(selectedRail.code)
             if (gatewayId.isEmpty()) {
-                promptSetGatewayId(selectedGateway) {
-                    updateGatewayUi(selectedGateway, rbEasypaisa, rbJazzCash, rbRaast, tvBanner)
+                promptSetGatewayId(selectedRail.code) {
+                    updateGatewayUi(selectedRail, rbEasypaisa, rbJazzCash, rbRaast, tvBanner)
                 }
                 return@setOnClickListener
             }
 
             val shopName = profileManager.getShopName()
 
-            // Generate 100% EMVCo ISO/IEC 18004 & Raast compliant QR code payload string
-            val emvQrPayload = EmvQrGenerator.generateMerchantQrPayload(
-                gatewayType = selectedGateway,
-                merchantIdOrTill = gatewayId,
+            // Generate multi-rail EMVCo ISO/IEC 18004 & Raast/SBP compliant QR code payload string
+            val emvQrPayload = PaymentRailQrFactory.createEmvcoQrPayload(
+                rail = selectedRail,
+                merchantTillOrAccount = gatewayId,
                 merchantName = shopName,
                 amount = amount
             )
@@ -110,8 +111,8 @@ class QrGeneratorActivity : BaseActivity() {
                 tvQrAmount.text = "Rs. ${"%.2f".format(amount)}"
 
                 // Render Till ID / Account Number BELOW QR
-                tvQrTillId.text = "Till ID / Account: $gatewayId ($selectedGateway)"
-                tvQrInstruction.text = "Scan with $selectedGateway, JazzCash, or Raast App"
+                tvQrTillId.text = "Till ID / Account: $gatewayId (${selectedRail.displayName})"
+                tvQrInstruction.text = "Scan with ${selectedRail.displayName}, Raast, or Banking App"
 
                 layoutResult.visibility = View.VISIBLE
                 FeedbackHelper.showSuccess(findViewById(android.R.id.content), "Customer Payment QR generated!")
@@ -127,45 +128,45 @@ class QrGeneratorActivity : BaseActivity() {
     }
 
     private fun updateGatewayUi(
-        gateway: String,
+        rail: PaymentRail,
         rbEasypaisa: RadioButton,
         rbJazzCash: RadioButton,
         rbRaast: RadioButton,
         tvBanner: TextView
     ) {
-        val activeBg = Color.parseColor("#10B981")
+        val activeBg = Color.parseColor(rail.brandColorHex)
         val inactiveBg = Color.parseColor("#1E293B")
 
-        rbEasypaisa.setBackgroundColor(if (gateway == "EASYPAISA") activeBg else inactiveBg)
-        rbJazzCash.setBackgroundColor(if (gateway == "JAZZCASH") activeBg else inactiveBg)
-        rbRaast.setBackgroundColor(if (gateway == "RAAST") activeBg else inactiveBg)
+        rbEasypaisa.setBackgroundColor(if (rail == PaymentRail.EASYPAISA) activeBg else inactiveBg)
+        rbJazzCash.setBackgroundColor(if (rail == PaymentRail.JAZZCASH) activeBg else inactiveBg)
+        rbRaast.setBackgroundColor(if (rail == PaymentRail.RAAST) activeBg else inactiveBg)
 
-        val id = profileManager.getGatewayId(gateway)
+        val id = profileManager.getGatewayId(rail.code)
         if (id.isNotEmpty()) {
-            tvBanner.text = "Receiving on: $gateway ($id)"
+            tvBanner.text = "Receiving on: ${rail.displayName} ($id)"
             tvBanner.setTextColor(Color.parseColor("#10B981"))
         } else {
-            tvBanner.text = "Tap to set $gateway Till ID / Number"
+            tvBanner.text = "Tap to set ${rail.displayName} Till ID / Number"
             tvBanner.setTextColor(Color.parseColor("#EF4444"))
         }
     }
 
-    private fun promptSetGatewayId(gateway: String, onSaved: () -> Unit) {
+    private fun promptSetGatewayId(gatewayCode: String, onSaved: () -> Unit) {
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("Set $gateway Till/Account ID")
+        builder.setTitle("Set $gatewayCode Till/Account ID")
 
         val input = EditText(this).apply {
             hint = "Enter Till ID or Mobile Account Number"
             setPadding(40, 40, 40, 40)
-            setText(profileManager.getGatewayId(gateway))
+            setText(profileManager.getGatewayId(gatewayCode))
         }
         builder.setView(input)
 
         builder.setPositiveButton("Save") { _, _ ->
             val enteredId = input.text.toString().trim()
             if (enteredId.isNotEmpty()) {
-                profileManager.saveGatewayId(gateway, enteredId)
-                FeedbackHelper.showSuccess(findViewById(android.R.id.content), "$gateway ID saved!")
+                profileManager.saveGatewayId(gatewayCode, enteredId)
+                FeedbackHelper.showSuccess(findViewById(android.R.id.content), "$gatewayCode ID saved!")
                 onSaved()
             } else {
                 FeedbackHelper.showError(findViewById(android.R.id.content), "ID cannot be empty")
