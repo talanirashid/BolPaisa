@@ -52,6 +52,8 @@
         <activity android:name=".ui.SubscriptionActivity" android:exported="true" />
         <activity android:name=".ui.SummaryActivity" android:exported="true" />
         <activity android:name=".ui.VoiceSettingsActivity" android:exported="true" />
+        <activity android:name=".ui.LanguageSettingsActivity" android:exported="true" />
+        <activity android:name=".ui.SafeDemoActivity" android:exported="true" />
         <activity android:name=".ui.AdminPortalActivity" android:exported="false" />
 
         <!-- Ongoing Sticky Service -->

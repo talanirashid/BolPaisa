@@ -71,7 +71,7 @@
                 android:layout_marginStart="8dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="About"
-                android:src="@android:drawable/ic_menu_revert"
+                android:src="@android:drawable/ic_menu_info_details"
                 android:tint="#94A3B8" />
 
         </LinearLayout>
@@ -271,7 +271,7 @@
 
         </LinearLayout>
 
-        <!-- 4. Merchant Tools Grid -->
+        <!-- 4. Merchant Tools Grid (8 Cards) -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -359,7 +359,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="All transactions"
+                    android:text="All transactions &amp; Search"
                     android:textColor="#A7B7CD"
                     android:textSize="12sp" />
 
@@ -406,7 +406,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Dynamic payment QR"
+                    android:text="Counter Payment QR"
                     android:textColor="#A7B7CD"
                     android:textSize="12sp" />
 
@@ -444,7 +444,181 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Languages &amp; Speaker"
+                    android:text="Speaker &amp; Volume Boost"
+                    android:textColor="#A7B7CD"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Row 3 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <!-- Card 5: App Language -->
+            <LinearLayout
+                android:id="@+id/cardAppLanguage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:background="#182436"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:contentDescription="Language Icon"
+                    android:src="@android:drawable/ic_menu_sort_alphabetically"
+                    android:tint="#38BDF8" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="App Language"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="ایپ کی زبان / ٻولي"
+                    android:textColor="#A7B7CD"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <!-- Card 6: Safe Demo Mode -->
+            <LinearLayout
+                android:id="@+id/cardSafeDemo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="#182436"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:contentDescription="Demo Icon"
+                    android:src="@android:drawable/ic_media_play"
+                    android:tint="#10B981" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Safe Demo Mode"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Shop Sound &amp; Ledger Demo"
+                    android:textColor="#A7B7CD"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Row 4 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <!-- Card 7: Diagnostic & Support -->
+            <LinearLayout
+                android:id="@+id/cardDiagnostic"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:background="#182436"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:contentDescription="Diagnostic Icon"
+                    android:src="@android:drawable/ic_menu_help"
+                    android:tint="#38BDF8" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Diagnostic &amp; Support"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="WhatsApp Report"
+                    android:textColor="#A7B7CD"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <!-- Card 8: Shop Profile -->
+            <LinearLayout
+                android:id="@+id/cardShopProfile"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="#182436"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:contentDescription="Profile Icon"
+                    android:src="@android:drawable/ic_menu_preferences"
+                    android:tint="#10B981" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Shop Profile"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Shop Name &amp; Preferences"
                     android:textColor="#A7B7CD"
                     android:textSize="12sp" />
 

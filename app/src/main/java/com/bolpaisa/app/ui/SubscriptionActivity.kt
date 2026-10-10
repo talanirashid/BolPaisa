@@ -21,7 +21,7 @@ import com.bolpaisa.app.util.FeedbackHelper
 class SubscriptionActivity : AppCompatActivity() {
 
     private lateinit var subscriptionManager: SubscriptionManager
-    private var selectedPlanName = "Monthly Pass - Rs. 150"
+    private var selectedPlanName: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +60,9 @@ class SubscriptionActivity : AppCompatActivity() {
             tvDaysRemaining.text = "0 Days Remaining"
         }
 
+        tvMonthlyCheck.visibility = View.GONE
+        tvAnnualCheck.visibility = View.GONE
+
         btnCopyDeviceId.setOnClickListener {
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("Device ID", deviceId)
@@ -69,6 +72,7 @@ class SubscriptionActivity : AppCompatActivity() {
 
         cardMonthly.setOnClickListener {
             selectedPlanName = "Monthly Pass - Rs. 150"
+            tvMonthlyCheck.text = "✓ Selected"
             tvMonthlyCheck.visibility = View.VISIBLE
             tvAnnualCheck.visibility = View.GONE
             cardMonthly.setBackgroundColor(Color.parseColor("#1B382B"))
@@ -87,6 +91,11 @@ class SubscriptionActivity : AppCompatActivity() {
         }
 
         btnSendWhatsAppProof.setOnClickListener {
+            if (selectedPlanName == null) {
+                FeedbackHelper.showError(findViewById(android.R.id.content), "Please select a license plan (Monthly or Annual) first!")
+                return@setOnClickListener
+            }
+
             val message = """
                 Assalam-o-Alaikum Mehrzaad Technologies!
                 I want to activate BolPaisa:

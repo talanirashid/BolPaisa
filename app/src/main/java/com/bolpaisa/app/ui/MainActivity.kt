@@ -71,11 +71,15 @@ class MainActivity : AppCompatActivity() {
         val btnReplayHero = findViewById<Button>(R.id.btnReplayHero)
         val btnReceiptHero = findViewById<Button>(R.id.btnReceiptHero)
 
-        // Merchant Tools Grid
+        // Merchant Tools Grid (8 Cards)
         val cardSummary = findViewById<View>(R.id.cardSummary)
         val cardHistory = findViewById<View>(R.id.cardHistory)
         val cardCustomerQr = findViewById<View>(R.id.cardCustomerQr)
         val cardVoiceSettings = findViewById<View>(R.id.cardVoiceSettings)
+        val cardAppLanguage = findViewById<View>(R.id.cardAppLanguage)
+        val cardSafeDemo = findViewById<View>(R.id.cardSafeDemo)
+        val cardDiagnostic = findViewById<View>(R.id.cardDiagnostic)
+        val cardShopProfile = findViewById<View>(R.id.cardShopProfile)
 
         // Subscription Card
         val cardSubscription = findViewById<View>(R.id.cardSubscription)
@@ -126,12 +130,41 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, VoiceSettingsActivity::class.java))
         }
 
+        cardAppLanguage?.setOnClickListener {
+            startActivity(Intent(this, LanguageSettingsActivity::class.java))
+        }
+
+        cardSafeDemo?.setOnClickListener {
+            startActivity(Intent(this, SafeDemoActivity::class.java))
+        }
+
+        cardDiagnostic?.setOnClickListener {
+            startActivity(Intent(this, AboutActivity::class.java))
+        }
+
+        cardShopProfile?.setOnClickListener {
+            promptShopProfileDialog()
+        }
+
         cardSubscription?.setOnClickListener {
             startActivity(Intent(this, SubscriptionActivity::class.java))
         }
 
         checkAndPromptShopSetup()
         observeTodayTransactions(tvEmptyHistory)
+    }
+
+    private fun promptShopProfileDialog() {
+        val dialog = ShopSetupDialog(
+            this,
+            onProfileSaved = {
+                observeDashboardData()
+            },
+            onSelectLogoRequested = {
+                selectLogoLauncher.launch("image/*")
+            }
+        )
+        dialog.show()
     }
 
     private fun checkAndPromptShopSetup() {
