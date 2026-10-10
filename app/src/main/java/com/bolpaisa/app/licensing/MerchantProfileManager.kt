@@ -3,24 +3,12 @@ package com.bolpaisa.app.licensing
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import java.io.File
 import java.io.FileOutputStream
 
 class MerchantProfileManager(private val context: Context) {
 
-    private val masterKey = MasterKey.Builder(context)
-        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-        .build()
-
-    private val prefs = EncryptedSharedPreferences.create(
-        context,
-        "secure_merchant_profile_prefs",
-        masterKey,
-        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-    )
+    private val prefs = SafeEncryptedPreferences.get(context, "secure_merchant_profile_prefs")
 
     companion object {
         const val KEY_SHOP_NAME = "key_shop_name"
