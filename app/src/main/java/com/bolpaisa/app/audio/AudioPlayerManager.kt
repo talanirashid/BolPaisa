@@ -5,11 +5,11 @@ import android.content.res.AssetFileDescriptor
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.media.RingtoneManager
 import android.os.PowerManager
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import androidx.annotation.RawRes
+import com.bolpaisa.app.util.LocaleHelper
 import java.util.LinkedList
 import java.util.Locale
 import java.util.Queue
@@ -27,6 +27,7 @@ class AudioPlayerManager(private val context: Context) : TextToSpeech.OnInitList
     private var isPlaying = false
     private var wakeLock: PowerManager.WakeLock? = null
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    private val voiceAlertEngine = VoiceAlertEngine(context)
 
     private var tts: TextToSpeech? = null
     private var isTtsReady = false
@@ -57,45 +58,12 @@ class AudioPlayerManager(private val context: Context) : TextToSpeech.OnInitList
     }
 
     fun ensureAudibleVolume() {
-        try {
-            val maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-            val currentVol = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-            val targetVol = (maxVol * 0.75f).toInt()
-            if (currentVol < targetVol) {
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, targetVol, AudioManager.FLAG_SHOW_UI)
-                Log.i(tag, "Boosted STREAM_MUSIC volume from $currentVol to $targetVol")
-            }
-        } catch (e: Exception) {
-            Log.w(tag, "Volume guard warning: ${e.message}")
-        }
+        voiceAlertEngine.ensureAudibleVolume()
     }
 
     fun playSampleAlert(langCode: String) {
-        ensureAudibleVolume()
-
-        val sampleResName = when (langCode.lowercase()) {
-            "en" -> "sample_english"
-            "sd" -> "sample_sindhi"
-            else -> "sample_urdu"
-        }
-
-        val resId = context.resources.getIdentifier(sampleResName, "raw", context.packageName)
-        if (resId != 0) {
-            playSequence(listOf(resId), "Rs. 150 received via Easypaisa")
-        } else {
-            val dingRes = context.resources.getIdentifier("ding", "raw", context.packageName)
-            val epRes = context.resources.getIdentifier("easypaisa_par", "raw", context.packageName)
-            val rupayRes = context.resources.getIdentifier("rupay", "raw", context.packageName)
-            val wasoolRes = context.resources.getIdentifier("wasool_huay", "raw", context.packageName)
-
-            val seq = mutableListOf<Int>()
-            if (dingRes != 0) seq.add(dingRes)
-            if (epRes != 0) seq.add(epRes)
-            if (rupayRes != 0) seq.add(rupayRes)
-            if (wasoolRes != 0) seq.add(wasoolRes)
-
-            playSequence(seq, "Easypaisa par Rs. 150 wasool huay")
-        }
+        val activeLang = if (langCode.isNotEmpty()) langCode else LocaleHelper.getLanguage(context)
+        voiceAlertEngine.speakPaymentAlert("Easypaisa", 150, activeLang)
     }
 
     @Synchronized
@@ -147,8 +115,9 @@ class AudioPlayerManager(private val context: Context) : TextToSpeech.OnInitList
 
         currentPlayer = createConfiguredPlayer(firstResId)
         if (currentPlayer == null) {
-            Log.w(tag, "Raw audio res $firstResId missing. Falling back to TTS/Chime speech.")
-            playFallbackSpeech(fallbackText)
+            Log.w(tag, "Raw audio res $firstResId missing. Falling back to Neural TTS speech.")
+            voiceAlertEngine.speakPaymentAlert("Easypaisa", 150, LocaleHelper.getLanguage(context))
+            processNextJob(fallbackText)
             return
         }
 
@@ -223,20 +192,7 @@ class AudioPlayerManager(private val context: Context) : TextToSpeech.OnInitList
     }
 
     fun playFallbackSpeech(text: String) {
-        ensureAudibleVolume()
-        notifyState(true)
-        if (isTtsReady && tts != null) {
-            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "BolPaisaTts")
-        } else {
-            try {
-                val notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-                val r = RingtoneManager.getRingtone(context, notification)
-                r.play()
-            } catch (e: Exception) {
-                Log.e(tag, "Ringtone fallback error: ${e.message}")
-            }
-        }
-        notifyState(false)
+        voiceAlertEngine.speakPaymentAlert("Easypaisa", text, LocaleHelper.getLanguage(context))
     }
 
     private fun acquireWakeLock() {
@@ -275,6 +231,7 @@ class AudioPlayerManager(private val context: Context) : TextToSpeech.OnInitList
 
             tts?.stop()
             tts?.shutdown()
+            voiceAlertEngine.release()
         } catch (e: Exception) {
             Log.e(tag, "Error releasing MediaPlayers", e)
         }
