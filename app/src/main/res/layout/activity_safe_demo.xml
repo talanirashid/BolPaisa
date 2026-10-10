@@ -33,11 +33,24 @@
 
     </LinearLayout>
 
-    <!-- Card 1: Demo Audio Announcement -->
+    <!-- Top Simulation Banner -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="#182436"
+        android:gravity="center"
+        android:padding="12dp"
+        android:text="🛡️ SAFE DEMO MODE - SIMULATION ONLY"
+        android:textColor="#38BDF8"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <!-- Card 1: Demo Audio Announcement Simulations -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:background="#1E293B"
         android:orientation="vertical"
         android:padding="20dp">
@@ -45,8 +58,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Test Voice Announcements"
-            android:textColor="#38BDF8"
+            android:text="Simulate Payment Voice Alerts"
+            android:textColor="#F8FAFC"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -54,20 +67,32 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Play sample payment alerts in Urdu, English, or Sindhi without modifying your sales records."
+            android:text="Test payment alerts on counter speakers without altering your real collections or database records."
             android:textColor="#94A3B8"
             android:textSize="13sp" />
 
         <Button
-            android:id="@+id/btnPlayDemoAudio"
+            android:id="@+id/btnSimulateEasypaisa"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="48dp"
             android:layout_marginTop="16dp"
             android:backgroundTint="#10B981"
-            android:text="Play Demo Voice Alert"
+            android:text="Simulate Rs. 150 Easypaisa Alert"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
-            android:textSize="14sp"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnSimulateJazzCash"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="#24344B"
+            android:text="Simulate Rs. 500 JazzCash Alert"
+            android:textAllCaps="false"
+            android:textColor="#38BDF8"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
     </LinearLayout>
@@ -85,7 +110,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Preview Demo PDF Report"
-            android:textColor="#38BDF8"
+            android:textColor="#F8FAFC"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -100,13 +125,13 @@
         <Button
             android:id="@+id/btnPreviewDemoPdf"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="48dp"
             android:layout_marginTop="16dp"
             android:backgroundTint="#24344B"
             android:text="Preview Demo PDF Report"
             android:textAllCaps="false"
             android:textColor="#38BDF8"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
     </LinearLayout>
@@ -115,7 +140,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:background="#182436"
         android:gravity="center"
         android:padding="16dp"
