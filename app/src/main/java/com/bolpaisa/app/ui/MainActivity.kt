@@ -139,7 +139,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         cardDiagnostic?.setOnClickListener {
-            startActivity(Intent(this, AboutActivity::class.java))
+            startActivity(Intent(this, DiagnosticsActivity::class.java))
         }
 
         cardShopProfile?.setOnClickListener {
