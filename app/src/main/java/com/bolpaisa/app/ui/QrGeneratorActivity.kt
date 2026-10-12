@@ -23,6 +23,7 @@ import com.bolpaisa.app.licensing.MerchantProfileManager
 import com.bolpaisa.app.util.FeedbackHelper
 import com.bolpaisa.app.util.PaymentQrRouter
 import com.bolpaisa.app.util.PaymentRail
+import com.bolpaisa.app.util.RaastQrEncoder
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import java.io.File
@@ -114,7 +115,7 @@ class QrGeneratorActivity : BaseActivity() {
                 amount = amount
             )
 
-            val bitmap = generateQrBitmap(qrResult.rawPayload, 600, 600)
+            val bitmap = RaastQrEncoder.renderQrBitmap(qrResult.rawPayload, 600)
             if (bitmap != null) {
                 activeGeneratedBitmap = bitmap
                 ivQrImage.setImageBitmap(bitmap)
