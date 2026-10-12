@@ -24,6 +24,7 @@ import com.bolpaisa.app.data.AppDatabase
 import com.bolpaisa.app.data.TransactionEntity
 import com.bolpaisa.app.licensing.MerchantProfileManager
 import com.bolpaisa.app.licensing.SubscriptionManager
+import com.bolpaisa.app.util.FeedbackHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -148,6 +149,19 @@ class MainActivity : BaseActivity() {
 
         checkAndPromptShopSetup()
         observeTodayTransactions(tvEmptyHistory)
+        observeIncomingPaymentEvents()
+    }
+
+    private fun observeIncomingPaymentEvents() {
+        lifecycleScope.launch {
+            com.bolpaisa.app.data.PaymentRepository.incomingPayments.collect { event ->
+                observeDashboardData()
+                FeedbackHelper.showSuccess(
+                    findViewById(android.R.id.content),
+                    "Received Rs. ${"%.2f".format(event.amount)} via ${event.rail.displayName}!"
+                )
+            }
+        }
     }
 
     private fun promptShopProfileDialog() {

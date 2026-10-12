@@ -38,6 +38,14 @@ class VoiceAlertEngine(private val context: Context) : TextToSpeech.OnInitListen
         }
     }
 
+    companion object {
+        fun announcePayment(context: Context, amount: Double, rail: com.bolpaisa.app.util.PaymentRail) {
+            val engine = VoiceAlertEngine(context)
+            val lang = com.bolpaisa.app.util.LocaleHelper.getVoiceLanguage(context)
+            engine.speakPaymentAlert(rail.displayName, amount, lang)
+        }
+    }
+
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
             tts?.setSpeechRate(0.92f)

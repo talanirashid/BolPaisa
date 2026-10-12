@@ -20,12 +20,14 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
 import com.bolpaisa.app.R
 import com.bolpaisa.app.licensing.MerchantProfileManager
 import com.bolpaisa.app.util.FeedbackHelper
 import com.bolpaisa.app.util.PaymentQrRouter
 import com.bolpaisa.app.util.PaymentRail
 import com.bolpaisa.app.util.RaastQrEncoder
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Locale
@@ -198,6 +200,19 @@ class QrGeneratorActivity : BaseActivity() {
             expiryTimer?.cancel()
             layoutResult.visibility = View.GONE
             etAmount.setText("")
+        }
+
+        val layoutSuccessOverlay = findViewById<View>(R.id.layoutPaymentSuccessOverlay)
+        val tvReceivedOverlayAmount = findViewById<TextView>(R.id.tvReceivedAmountOverlay)
+
+        lifecycleScope.launch {
+            com.bolpaisa.app.data.PaymentRepository.incomingPayments.collect { event ->
+                tvReceivedOverlayAmount?.text = "Rs. ${"%.2f".format(event.amount)}"
+                layoutSuccessOverlay?.visibility = View.VISIBLE
+                layoutSuccessOverlay?.postDelayed({
+                    layoutSuccessOverlay?.visibility = View.GONE
+                }, 4000L)
+            }
         }
     }
 

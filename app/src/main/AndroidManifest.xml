@@ -70,6 +70,17 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <!-- Notification Listener Service for Incoming Payment Interception -->
+        <service
+            android:name=".service.PaymentNotificationListener"
+            android:label="BolPaisa Payment Listener"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
         <!-- Ongoing Sticky Service -->
         <service
             android:name=".service.SoundboxService"
