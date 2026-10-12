@@ -66,6 +66,7 @@ class QrGeneratorActivity : BaseActivity() {
         val ivQrImage = findViewById<ImageView>(R.id.ivQrImage)
         val tvQrTillId = findViewById<TextView>(R.id.tvQrTillId)
         val tvQrInstruction = findViewById<TextView>(R.id.tvQrInstruction)
+        val btnPrintStandee = findViewById<Button>(R.id.btnPrintStandee)
         val btnShareQr = findViewById<Button>(R.id.btnShareQr)
         val btnDownloadQr = findViewById<Button>(R.id.btnDownloadQr)
         val btnDone = findViewById<Button>(R.id.btnDoneQr)
@@ -184,6 +185,14 @@ class QrGeneratorActivity : BaseActivity() {
             }
         }
 
+        btnPrintStandee?.setOnClickListener {
+            activeGeneratedBitmap?.let { bmp ->
+                val gatewayId = profileManager.getGatewayId(selectedRail.code)
+                val shopName = profileManager.getShopName()
+                promptPrintStandeeSize(shopName, gatewayId, bmp)
+            }
+        }
+
         btnShareQr?.setOnClickListener {
             activeGeneratedBitmap?.let { bmp ->
                 shareQrBitmap(bmp)
@@ -214,6 +223,34 @@ class QrGeneratorActivity : BaseActivity() {
                 }, 4000L)
             }
         }
+    }
+
+    private fun promptPrintStandeeSize(merchantName: String, merchantId: String, bitmap: Bitmap) {
+        val options = arrayOf(
+            com.bolpaisa.app.print.StandeeSize.A5.displayName,
+            com.bolpaisa.app.print.StandeeSize.PHOTO_4X6.displayName,
+            com.bolpaisa.app.print.StandeeSize.A4.displayName
+        )
+        val sizes = arrayOf(
+            com.bolpaisa.app.print.StandeeSize.A5,
+            com.bolpaisa.app.print.StandeeSize.PHOTO_4X6,
+            com.bolpaisa.app.print.StandeeSize.A4
+        )
+
+        AlertDialog.Builder(this)
+            .setTitle("Select Standee Print Size")
+            .setItems(options) { _, which ->
+                val selectedSize = sizes[which]
+                FeedbackHelper.showInfo(findViewById(android.R.id.content), "Opening Print Manager for ${selectedSize.displayName}...")
+                com.bolpaisa.app.print.StandeePrintHelper(this).printStandee(
+                    merchantName = merchantName,
+                    merchantIbanOrTill = merchantId,
+                    qrBitmap = bitmap,
+                    standeeSize = selectedSize
+                )
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun shareQrBitmap(bitmap: Bitmap) {

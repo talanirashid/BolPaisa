@@ -437,10 +437,22 @@
                     </LinearLayout>
 
                     <!-- 6. ACTION BUTTONS -->
+                    <Button
+                        android:id="@+id/btnPrintStandee"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="#006A4E"
+                        android:text="Print Standee / PDF (A5 / 4x6 / A4)"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="10dp"
                         android:orientation="horizontal">
 
                         <Button
@@ -475,7 +487,7 @@
                         android:id="@+id/btnDoneQr"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="10dp"
                         android:backgroundTint="#182436"
                         android:text="Done / New Payment"
                         android:textAllCaps="false"
