@@ -168,6 +168,58 @@ class VoiceAlertEngine(private val context: Context) : TextToSpeech.OnInitListen
         releaseWakeLock()
     }
 
+    fun announceDailySummary() {
+        val summary = com.bolpaisa.app.data.DailySettlementManager.getTodaySummary()
+        val lang = com.bolpaisa.app.util.LocaleHelper.getVoiceLanguage(context)
+        val formattedTotal = if (summary.totalAmount % 1.0 == 0.0) {
+            summary.totalAmount.toLong().toString()
+        } else {
+            String.format(Locale.US, "%,.2f", summary.totalAmount)
+        }
+
+        val announcement = when (lang.lowercase()) {
+            "sd" -> "اڄ جي ڪل رقم ${summary.transactionCount} ٽرانزيڪشنز ۾ $formattedTotal رپيا آهي"
+            "en" -> "Today's total collection across ${summary.transactionCount} payments is $formattedTotal rupees"
+            else -> "Aaj ki kul kamai ${summary.transactionCount} transactions mein $formattedTotal rupay hai"
+        }
+
+        ensureAudibleVolume()
+        requestAudioFocus()
+        if (isTtsReady && tts != null) {
+            val targetLocale = when (lang.lowercase()) {
+                "en" -> Locale("en", "PK")
+                "sd" -> Locale("sd", "PK")
+                else -> Locale("ur", "PK")
+            }
+            try {
+                tts?.language = targetLocale
+                tts?.speak(announcement, TextToSpeech.QUEUE_FLUSH, null, "bolpaisa_daily_summary")
+            } catch (e: Exception) {
+                tts?.language = Locale.ENGLISH
+                tts?.speak(announcement, TextToSpeech.QUEUE_FLUSH, null, "bolpaisa_daily_summary")
+            }
+        }
+    }
+
+    fun repeatLastPayment() {
+        val last = com.bolpaisa.app.data.DailySettlementManager.getLastPayment()
+        val lang = com.bolpaisa.app.util.LocaleHelper.getVoiceLanguage(context)
+        if (last != null) {
+            speakPaymentAlert(last.rail.displayName, last.amount, lang)
+        } else {
+            val msg = when (lang.lowercase()) {
+                "sd" -> "ڪا به آخري ٽرانزيڪشن نه ملي"
+                "en" -> "No recent transactions found"
+                else -> "Koi aakhri transaction nahi mili"
+            }
+            ensureAudibleVolume()
+            requestAudioFocus()
+            if (isTtsReady && tts != null) {
+                tts?.speak(msg, TextToSpeech.QUEUE_FLUSH, null, "bolpaisa_no_tx")
+            }
+        }
+    }
+
     fun getInstallTtsDataIntent(): Intent {
         return Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)
     }

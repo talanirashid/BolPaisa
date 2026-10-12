@@ -47,7 +47,8 @@ class PaymentNotificationListener : NotificationListenerService() {
                 e.printStackTrace()
             }
 
-            // 2. Emit to reactive UI flow
+            // 2. Record payment in DailySettlementManager & emit to reactive UI flow
+            com.bolpaisa.app.data.DailySettlementManager.recordPayment(payment)
             PaymentRepository.emitPayment(payment)
 
             // 3. Trigger voice alert announcement immediately
