@@ -1,369 +1,526 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#0F172A"
-    android:fillViewport="true">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:layout_height="match_parent"
+        android:background="#0F172A"
+        android:fillViewport="true">
 
-        <!-- Top App Bar -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:padding="20dp">
 
-            <ImageButton
-                android:id="@+id/btnBack"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Back"
-                android:src="@android:drawable/ic_menu_revert"
-                android:tint="#FFFFFF" />
+            <!-- Top App Bar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Back"
+                    android:src="@android:drawable/ic_menu_revert"
+                    android:tint="#FFFFFF" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="Customer QR"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- Wallet Selector -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Select Receiving Wallet"
+                android:textColor="#94A3B8"
+                android:textSize="13sp" />
+
+            <RadioGroup
+                android:id="@+id/rgWalletSelector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rbEasypaisa"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="#1E293B"
+                    android:button="@null"
+                    android:checked="true"
+                    android:gravity="center"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="12dp"
+                    android:text="Easypaisa"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/rbJazzCash"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="#1E293B"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="12dp"
+                    android:text="JazzCash"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/rbRaast"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="#1E293B"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="12dp"
+                    android:text="Raast"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </RadioGroup>
+
+            <!-- Receiving Account Banner -->
+            <TextView
+                android:id="@+id/tvReceivingAccountBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="#1E293B"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:padding="14dp"
+                android:text="Receiving on: Easypaisa (03336366291)"
+                android:textColor="#10B981"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <!-- Pakistani Quick Currency Chips -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btnChip500"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:backgroundTint="#1E293B"
+                        android:text="+500"
+                        android:textAllCaps="false"
+                        android:textColor="#38BDF8"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnChip1000"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="8dp"
+                        android:backgroundTint="#1E293B"
+                        android:text="+1,000"
+                        android:textAllCaps="false"
+                        android:textColor="#38BDF8"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnChip5000"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="8dp"
+                        android:backgroundTint="#1E293B"
+                        android:text="+5,000"
+                        android:textAllCaps="false"
+                        android:textColor="#38BDF8"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnChipClear"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="8dp"
+                        android:backgroundTint="#7F1D1D"
+                        android:text="Clear"
+                        android:textAllCaps="false"
+                        android:textColor="#EF4444"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </HorizontalScrollView>
+
+            <!-- Amount Input Field -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Enter Payment Amount (Rs.)"
+                android:textColor="#94A3B8"
+                android:textSize="13sp" />
+
+            <EditText
+                android:id="@+id/etAmountInput"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="8dp"
+                android:background="#1E293B"
+                android:hint="Rs. 0.00"
+                android:inputType="numberDecimal"
+                android:paddingHorizontal="16dp"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#64748B"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- Generate QR Button -->
+            <Button
+                android:id="@+id/btnGenerateQr"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="20dp"
+                android:backgroundTint="#10B981"
+                android:text="Generate Customer QR"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- Official SBP / Raast Standee Card Result Container -->
+            <LinearLayout
+                android:id="@+id/layoutQrResult"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="#FFFFFF"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- 1. TOP HEADER: Official SBP / Raast Banner -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#006A4E"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="14dp">
+
+                    <ImageView
+                        android:id="@+id/ivQrRailLogo"
+                        android:layout_width="80dp"
+                        android:layout_height="28dp"
+                        android:contentDescription="Raast Logo"
+                        android:src="@drawable/ic_logo_raast" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="National P2M QR / قومی کیو آر"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- 2. MERCHANT IDENTITY -->
+                    <TextView
+                        android:id="@+id/tvQrShopName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="MADINA GENERAL STORE"
+                        android:textColor="#1E293B"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvQrTillId"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:gravity="center"
+                        android:text="RAAST ID / IBAN: 03336366291 (Easypaisa)"
+                        android:textColor="#64748B"
+                        android:textSize="12sp" />
+
+                    <!-- 3. CENTER QR CODE WITH EMBEDDED EMBLEM -->
+                    <FrameLayout
+                        android:layout_width="250dp"
+                        android:layout_height="250dp"
+                        android:layout_marginTop="16dp"
+                        android:background="@android:color/white"
+                        android:padding="8dp">
+
+                        <ImageView
+                            android:id="@+id/ivQrImage"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="Customer Payment QR" />
+
+                        <!-- Central Raast Emblem -->
+                        <ImageView
+                            android:layout_width="46dp"
+                            android:layout_height="46dp"
+                            android:layout_gravity="center"
+                            android:background="#FFFFFF"
+                            android:contentDescription="Raast Mini Emblem"
+                            android:padding="4dp"
+                            android:src="@drawable/ic_logo_raast_mini" />
+
+                    </FrameLayout>
+
+                    <!-- 4. DYNAMIC AMOUNT BADGE & 3-MIN EXPIRY TIMER -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvQrAmount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="#E8F5E9"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="6dp"
+                            android:text="Payable Amount: Rs. 150.00"
+                            android:textColor="#1B5E20"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvQrExpiryTimer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="#FEF2F2"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="6dp"
+                            android:text="Expires in 03:00"
+                            android:textColor="#DC2626"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+
+                    <!-- 5. FOOTER ACCEPTED PARTNER LOGOS -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:background="#F8FAFC"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:id="@+id/tvQrInstruction"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Scan &amp; Pay using any Mobile Banking or Wallet App"
+                            android:textColor="#475569"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="54dp"
+                                android:layout_height="28dp"
+                                android:contentDescription="Easypaisa"
+                                android:src="@drawable/ic_logo_easypaisa" />
+
+                            <ImageView
+                                android:layout_width="54dp"
+                                android:layout_height="28dp"
+                                android:layout_marginStart="12dp"
+                                android:contentDescription="JazzCash"
+                                android:src="@drawable/ic_logo_jazzcash" />
+
+                            <ImageView
+                                android:layout_width="54dp"
+                                android:layout_height="28dp"
+                                android:layout_marginStart="12dp"
+                                android:contentDescription="1LINK All Banks"
+                                android:src="@drawable/ic_logo_onelink" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- 6. ACTION BUTTONS -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btnShareQr"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_marginEnd="6dp"
+                            android:layout_weight="1"
+                            android:backgroundTint="#25D366"
+                            android:text="Share QR"
+                            android:textAllCaps="false"
+                            android:textColor="#FFFFFF"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <Button
+                            android:id="@+id/btnDownloadQr"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_marginStart="6dp"
+                            android:layout_weight="1"
+                            android:backgroundTint="#24344B"
+                            android:text="Download QR"
+                            android:textAllCaps="false"
+                            android:textColor="#38BDF8"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btnDoneQr"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginTop="12dp"
+                        android:backgroundTint="#182436"
+                        android:text="Done / New Payment"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- Animated Payment Received Popup Overlay -->
+    <FrameLayout
+        android:id="@+id/layoutPaymentSuccessOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#A6000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="32dp"
+            android:background="#FFFFFF"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="28dp">
+
+            <TextView
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:background="#E8F5E9"
+                android:gravity="center"
+                android:text="✓"
+                android:textColor="#00C853"
+                android:textSize="42sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:text="Customer QR"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp"
+                android:layout_marginTop="16dp"
+                android:text="Payment Received!"
+                android:textColor="#1E293B"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="رقم موصول ہو گئی ہے"
+                android:textColor="#006A4E"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvReceivedAmountOverlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Rs. 1,500.00"
+                android:textColor="#00C853"
+                android:textSize="26sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
 
-        <!-- Wallet Selector -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Select Receiving Wallet"
-            android:textColor="#94A3B8"
-            android:textSize="13sp" />
+    </FrameLayout>
 
-        <RadioGroup
-            android:id="@+id/rgWalletSelector"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/rbEasypaisa"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="#1E293B"
-                android:button="@null"
-                android:checked="true"
-                android:gravity="center"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="12dp"
-                android:text="Easypaisa"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <RadioButton
-                android:id="@+id/rbJazzCash"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:background="#1E293B"
-                android:button="@null"
-                android:gravity="center"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="12dp"
-                android:text="JazzCash"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <RadioButton
-                android:id="@+id/rbRaast"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:background="#1E293B"
-                android:button="@null"
-                android:gravity="center"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="12dp"
-                android:text="Raast"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-        </RadioGroup>
-
-        <!-- Receiving Account Banner -->
-        <TextView
-            android:id="@+id/tvReceivingAccountBanner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="#1E293B"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:padding="14dp"
-            android:text="Receiving on: Easypaisa (03336366291)"
-            android:textColor="#10B981"
-            android:textSize="13sp"
-            android:textStyle="bold" />
-
-        <!-- Amount Input Field -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Enter Payment Amount (Rs.)"
-            android:textColor="#94A3B8"
-            android:textSize="13sp" />
-
-        <EditText
-            android:id="@+id/etAmountInput"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="8dp"
-            android:background="#1E293B"
-            android:hint="Rs. 0.00"
-            android:inputType="numberDecimal"
-            android:paddingHorizontal="16dp"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#64748B"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <!-- Generate QR Button -->
-        <Button
-            android:id="@+id/btnGenerateQr"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:layout_marginTop="20dp"
-            android:backgroundTint="#10B981"
-            android:text="Generate Customer QR"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <!-- Official SBP / Raast Standee Card Result Container -->
-        <LinearLayout
-            android:id="@+id/layoutQrResult"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:background="#FFFFFF"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <!-- 1. TOP HEADER: Official SBP / Raast Banner -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#006A4E"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="14dp">
-
-                <ImageView
-                    android:id="@+id/ivQrRailLogo"
-                    android:layout_width="80dp"
-                    android:layout_height="28dp"
-                    android:contentDescription="Raast Logo"
-                    android:src="@drawable/ic_logo_raast" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="National P2M QR / قومی کیو آر"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="vertical"
-                android:padding="20dp">
-
-                <!-- 2. MERCHANT IDENTITY -->
-                <TextView
-                    android:id="@+id/tvQrShopName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="MADINA GENERAL STORE"
-                    android:textColor="#1E293B"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvQrTillId"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:gravity="center"
-                    android:text="RAAST ID / IBAN: 03336366291 (Easypaisa)"
-                    android:textColor="#64748B"
-                    android:textSize="12sp" />
-
-                <!-- 3. CENTER QR CODE WITH EMBEDDED EMBLEM -->
-                <FrameLayout
-                    android:layout_width="250dp"
-                    android:layout_height="250dp"
-                    android:layout_marginTop="16dp"
-                    android:background="@android:color/white"
-                    android:padding="8dp">
-
-                    <ImageView
-                        android:id="@+id/ivQrImage"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:contentDescription="Customer Payment QR" />
-
-                    <!-- Central Raast Emblem -->
-                    <ImageView
-                        android:layout_width="46dp"
-                        android:layout_height="46dp"
-                        android:layout_gravity="center"
-                        android:background="#FFFFFF"
-                        android:contentDescription="Raast Mini Emblem"
-                        android:padding="4dp"
-                        android:src="@drawable/ic_logo_raast_mini" />
-
-                </FrameLayout>
-
-                <!-- 4. DYNAMIC AMOUNT BADGE -->
-                <TextView
-                    android:id="@+id/tvQrAmount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:background="#E8F5E9"
-                    android:paddingHorizontal="14dp"
-                    android:paddingVertical="6dp"
-                    android:text="Payable Amount: Rs. 150.00"
-                    android:textColor="#1B5E20"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <!-- 5. FOOTER ACCEPTED PARTNER LOGOS -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:background="#F8FAFC"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical"
-                    android:padding="12dp">
-
-                    <TextView
-                        android:id="@+id/tvQrInstruction"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="Scan &amp; Pay using any Mobile Banking or Wallet App"
-                        android:textColor="#475569"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:gravity="center"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="54dp"
-                            android:layout_height="28dp"
-                            android:contentDescription="Easypaisa"
-                            android:src="@drawable/ic_logo_easypaisa" />
-
-                        <ImageView
-                            android:layout_width="54dp"
-                            android:layout_height="28dp"
-                            android:layout_marginStart="12dp"
-                            android:contentDescription="JazzCash"
-                            android:src="@drawable/ic_logo_jazzcash" />
-
-                        <ImageView
-                            android:layout_width="54dp"
-                            android:layout_height="28dp"
-                            android:layout_marginStart="12dp"
-                            android:contentDescription="1LINK All Banks"
-                            android:src="@drawable/ic_logo_onelink" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <!-- 6. ACTION BUTTONS -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/btnShareQr"
-                        android:layout_width="0dp"
-                        android:layout_height="48dp"
-                        android:layout_marginEnd="6dp"
-                        android:layout_weight="1"
-                        android:backgroundTint="#25D366"
-                        android:text="Share QR"
-                        android:textAllCaps="false"
-                        android:textColor="#FFFFFF"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-
-                    <Button
-                        android:id="@+id/btnDownloadQr"
-                        android:layout_width="0dp"
-                        android:layout_height="48dp"
-                        android:layout_marginStart="6dp"
-                        android:layout_weight="1"
-                        android:backgroundTint="#24344B"
-                        android:text="Download QR"
-                        android:textAllCaps="false"
-                        android:textColor="#38BDF8"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/btnDoneQr"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="12dp"
-                    android:backgroundTint="#182436"
-                    android:text="Done / New Payment"
-                    android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-</ScrollView>
+</FrameLayout>

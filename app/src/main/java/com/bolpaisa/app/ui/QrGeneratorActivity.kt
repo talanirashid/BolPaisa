@@ -6,9 +6,11 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.Environment
 import android.provider.MediaStore
 import android.view.View
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -24,19 +26,20 @@ import com.bolpaisa.app.util.FeedbackHelper
 import com.bolpaisa.app.util.PaymentQrRouter
 import com.bolpaisa.app.util.PaymentRail
 import com.bolpaisa.app.util.RaastQrEncoder
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.MultiFormatWriter
 import java.io.File
 import java.io.FileOutputStream
+import java.util.Locale
 
 class QrGeneratorActivity : BaseActivity() {
 
     private lateinit var profileManager: MerchantProfileManager
     private var selectedRail = PaymentRail.EASYPAISA
     private var activeGeneratedBitmap: Bitmap? = null
+    private var expiryTimer: CountDownTimer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContentView(R.layout.activity_qr_generator)
 
         profileManager = MerchantProfileManager(this)
@@ -48,11 +51,16 @@ class QrGeneratorActivity : BaseActivity() {
         val rbRaast = findViewById<RadioButton>(R.id.rbRaast)
         val tvBanner = findViewById<TextView>(R.id.tvReceivingAccountBanner)
         val etAmount = findViewById<EditText>(R.id.etAmountInput)
+        val btnChip500 = findViewById<Button>(R.id.btnChip500)
+        val btnChip1000 = findViewById<Button>(R.id.btnChip1000)
+        val btnChip5000 = findViewById<Button>(R.id.btnChip5000)
+        val btnChipClear = findViewById<Button>(R.id.btnChipClear)
         val btnGenerate = findViewById<Button>(R.id.btnGenerateQr)
         val layoutResult = findViewById<View>(R.id.layoutQrResult)
         val ivQrRailLogo = findViewById<ImageView>(R.id.ivQrRailLogo)
         val tvQrShopName = findViewById<TextView>(R.id.tvQrShopName)
         val tvQrAmount = findViewById<TextView>(R.id.tvQrAmount)
+        val tvQrExpiryTimer = findViewById<TextView>(R.id.tvQrExpiryTimer)
         val ivQrImage = findViewById<ImageView>(R.id.ivQrImage)
         val tvQrTillId = findViewById<TextView>(R.id.tvQrTillId)
         val tvQrInstruction = findViewById<TextView>(R.id.tvQrInstruction)
@@ -61,6 +69,17 @@ class QrGeneratorActivity : BaseActivity() {
         val btnDone = findViewById<Button>(R.id.btnDoneQr)
 
         btnBack.setOnClickListener { finish() }
+
+        val addQuickAmount: (Double) -> Unit = { added ->
+            val current = etAmount.text.toString().trim().toDoubleOrNull() ?: 0.0
+            val total = current + added
+            etAmount.setText(if (total % 1.0 == 0.0) total.toLong().toString() else total.toString())
+        }
+
+        btnChip500?.setOnClickListener { addQuickAmount(500.0) }
+        btnChip1000?.setOnClickListener { addQuickAmount(1000.0) }
+        btnChip5000?.setOnClickListener { addQuickAmount(5000.0) }
+        btnChipClear?.setOnClickListener { etAmount.setText("") }
 
         selectedRail = PaymentRail.fromCode(profileManager.getGatewayType())
         when (selectedRail) {
@@ -129,12 +148,32 @@ class QrGeneratorActivity : BaseActivity() {
                 ivQrRailLogo?.setImageResource(logoRes)
 
                 // Render Shop Name on TOP above QR
-                tvQrShopName.text = shopName.uppercase()
-                tvQrAmount.text = if (amount != null && amount > 0.0) "Rs. ${"%.2f".format(amount)}" else "Static Payment QR"
+                tvQrShopName.text = shopName.uppercase(Locale.ROOT)
+                tvQrAmount.text = if (amount != null && amount > 0.0) "Payable Amount: Rs. ${"%.2f".format(amount)}" else "Static: Customer Enters Amount"
+
+                // Start 3-minute dynamic QR expiry timer
+                expiryTimer?.cancel()
+                if (amount != null && amount > 0.0) {
+                    tvQrExpiryTimer?.visibility = View.VISIBLE
+                    expiryTimer = object : CountDownTimer(180_000L, 1000L) {
+                        override fun onTick(millisUntilFinished: Long) {
+                            val seconds = millisUntilFinished / 1000
+                            tvQrExpiryTimer?.text = String.format(Locale.US, "Expires in %02d:%02d", seconds / 60, seconds % 60)
+                        }
+
+                        override fun onFinish() {
+                            tvQrExpiryTimer?.visibility = View.GONE
+                            FeedbackHelper.showInfo(findViewById(android.R.id.content), "Dynamic QR expired. Reset to Static QR.")
+                            btnGenerate.performClick()
+                        }
+                    }.start()
+                } else {
+                    tvQrExpiryTimer?.visibility = View.GONE
+                }
 
                 // Render Till ID / Account Number BELOW QR
                 tvQrTillId.text = qrResult.footerLabel
-                tvQrInstruction.text = "Scan with ${selectedRail.displayName}, Raast, or Banking App"
+                tvQrInstruction.text = "Scan & Pay using any Mobile Banking or Wallet App"
 
                 layoutResult.visibility = View.VISIBLE
                 FeedbackHelper.showSuccess(findViewById(android.R.id.content), "Customer Payment QR generated!")
@@ -156,6 +195,7 @@ class QrGeneratorActivity : BaseActivity() {
         }
 
         btnDone.setOnClickListener {
+            expiryTimer?.cancel()
             layoutResult.visibility = View.GONE
             etAmount.setText("")
         }
@@ -271,19 +311,8 @@ class QrGeneratorActivity : BaseActivity() {
         builder.show()
     }
 
-    private fun generateQrBitmap(content: String, width: Int, height: Int): Bitmap? {
-        return try {
-            val bitMatrix = MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, width, height)
-            val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
-            for (x in 0 until width) {
-                for (y in 0 until height) {
-                    bmp.setPixel(x, y, if (bitMatrix.get(x, y)) Color.BLACK else Color.WHITE)
-                }
-            }
-            bmp
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
+    override fun onDestroy() {
+        super.onDestroy()
+        expiryTimer?.cancel()
     }
 }
