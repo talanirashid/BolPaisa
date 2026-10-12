@@ -19,9 +19,35 @@ object PaymentQrRouter {
     }
 
     /**
-     * Resolves and builds a 100% SBP & EMVCo ISO/IEC 18004 compliant payment QR payload via RaastQrEncoder.
-     * Intelligently routes 5-8 digit Till IDs vs 11-digit Mobile Numbers across Easypaisa, JazzCash, and Raast.
+     * Resolves and builds a hybrid multi-rail EMVCo payload containing Tag 26 (Raast), Tag 27 (Easypaisa Till), Tag 28 (JazzCash Till).
      */
+    fun resolveHybridPayload(
+        profile: MerchantTillProfile,
+        activeRail: PaymentRail
+    ): PaymentQrResult {
+        val fullPayload = BolPaisaMerchantQrEncoder.generateHybridPayload(profile)
+
+        val footer = when (activeRail) {
+            PaymentRail.EASYPAISA -> {
+                val epTill = profile.easypaisaTillId
+                if (!epTill.isNullOrBlank()) "Till ID: $epTill (Easypaisa Merchant)"
+                else "Raast ID: ${profile.raastIban} (Instant via Easypaisa & All Banks)"
+            }
+            PaymentRail.JAZZCASH -> {
+                val jcTill = profile.jazzcashTillId
+                if (!jcTill.isNullOrBlank()) "Till ID: $jcTill (JazzCash Merchant)"
+                else "Raast ID: ${profile.raastIban} (Instant via JazzCash & All Banks)"
+            }
+            PaymentRail.RAAST -> "Raast IBAN: ${profile.raastIban} (Interoperable Across All Banks)"
+        }
+
+        return PaymentQrResult(
+            rawPayload = fullPayload,
+            footerLabel = footer,
+            rail = activeRail
+        )
+    }
+
     fun resolvePaymentPayload(
         rail: PaymentRail,
         identifier: String,
@@ -30,34 +56,18 @@ object PaymentQrRouter {
         city: String = "KARACHI"
     ): PaymentQrResult {
         val cleanId = identifier.trim()
-        val isTillId = cleanId.length in 5..8 && cleanId.all { it.isDigit() }
+        val epTill = if (rail == PaymentRail.EASYPAISA && cleanId.length in 5..8) cleanId else null
+        val jcTill = if (rail == PaymentRail.JAZZCASH && cleanId.length in 5..8) cleanId else null
 
-        val footer = when (rail) {
-            PaymentRail.EASYPAISA -> {
-                if (isTillId) "Till ID: $cleanId (Easypaisa Merchant)"
-                else "Raast ID / Mobile: $cleanId (Instant via Easypaisa & All Banks)"
-            }
-            PaymentRail.JAZZCASH -> {
-                if (isTillId) "Till ID: $cleanId (JazzCash Merchant)"
-                else "Raast ID / Mobile: $cleanId (Instant via JazzCash & All Banks)"
-            }
-            PaymentRail.RAAST -> "Raast Pay: $cleanId (Interoperable Across All Banks)"
-        }
-
-        val params = RaastQrParams(
-            merchantIbanOrAlias = cleanId,
+        val profile = MerchantTillProfile(
             merchantName = recipientName,
             merchantCity = city,
-            amount = amount,
-            gatewayType = rail.code
+            raastIban = cleanId,
+            easypaisaTillId = epTill,
+            jazzcashTillId = jcTill,
+            dynamicAmount = amount
         )
 
-        val fullPayload = RaastQrEncoder.buildPayload(params)
-
-        return PaymentQrResult(
-            rawPayload = fullPayload,
-            footerLabel = footer,
-            rail = rail
-        )
+        return resolveHybridPayload(profile, rail)
     }
 }
