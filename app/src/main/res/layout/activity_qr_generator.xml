@@ -382,25 +382,55 @@
                             android:gravity="center"
                             android:orientation="horizontal">
 
-                            <ImageView
-                                android:layout_width="54dp"
-                                android:layout_height="28dp"
-                                android:contentDescription="Easypaisa"
-                                android:src="@drawable/ic_logo_easypaisa" />
+                            <!-- Easypaisa Partner Badge -->
+                            <FrameLayout
+                                android:layout_width="80dp"
+                                android:layout_height="38dp"
+                                android:background="#FFFFFF"
+                                android:padding="4dp">
 
-                            <ImageView
-                                android:layout_width="54dp"
-                                android:layout_height="28dp"
-                                android:layout_marginStart="12dp"
-                                android:contentDescription="JazzCash"
-                                android:src="@drawable/ic_logo_jazzcash" />
+                                <ImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:contentDescription="Easypaisa"
+                                    android:scaleType="fitCenter"
+                                    android:src="@drawable/ic_logo_easypaisa" />
 
-                            <ImageView
-                                android:layout_width="54dp"
-                                android:layout_height="28dp"
+                            </FrameLayout>
+
+                            <!-- JazzCash Partner Badge -->
+                            <FrameLayout
+                                android:layout_width="80dp"
+                                android:layout_height="38dp"
                                 android:layout_marginStart="12dp"
-                                android:contentDescription="1LINK All Banks"
-                                android:src="@drawable/ic_logo_onelink" />
+                                android:background="#FFFFFF"
+                                android:padding="4dp">
+
+                                <ImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:contentDescription="JazzCash"
+                                    android:scaleType="fitCenter"
+                                    android:src="@drawable/ic_logo_jazzcash" />
+
+                            </FrameLayout>
+
+                            <!-- 1LINK Partner Badge -->
+                            <FrameLayout
+                                android:layout_width="80dp"
+                                android:layout_height="38dp"
+                                android:layout_marginStart="12dp"
+                                android:background="#FFFFFF"
+                                android:padding="4dp">
+
+                                <ImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:contentDescription="1LINK All Banks"
+                                    android:scaleType="fitCenter"
+                                    android:src="@drawable/ic_logo_onelink" />
+
+                            </FrameLayout>
 
                         </LinearLayout>
 
